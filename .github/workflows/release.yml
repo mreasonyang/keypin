@@ -71,10 +71,11 @@ jobs:
             build/release/KeyPin-*-arm64.zip
             build/release/appcast.xml
             build/release/SHA256SUMS
+            build/release/verification.json
           if-no-files-found: error
           retention-days: 14
 
-  publish:
+  stage:
     needs: sign-and-notarize
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -89,7 +90,7 @@ jobs:
         with:
           name: KeyPin-release-${{ github.run_id }}-${{ github.run_attempt }}
           path: release
-      - name: Publish exact tag without overwriting an existing release
+      - name: Stage exact tag for installation acceptance without overwriting a release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -123,11 +124,11 @@ jobs:
           assert old and len(new) == 1 and new[0] > max(old), 'CFBundleVersion must increase beyond the previous stable release'
           PY
           fi
-          gh release create "$RELEASE_TAG" "KeyPin-${RELEASE_TAG#v}-arm64.zip" appcast.xml SHA256SUMS \
+          gh release create "$RELEASE_TAG" "KeyPin-${RELEASE_TAG#v}-arm64.zip" appcast.xml SHA256SUMS verification.json \
             --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "KeyPin ${RELEASE_TAG#v}" --generate-notes
           # A failed upload/verification stays draft. Re-running never overwrites it:
           # inspect and delete that failed draft before retrying the exact tag.
           gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/keypin-uploaded"
           (cd "$RUNNER_TEMP/keypin-uploaded" && sha256sum --check SHA256SUMS)
           cmp SHA256SUMS "$RUNNER_TEMP/keypin-uploaded/SHA256SUMS"
-          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          echo 'PASS: draft assets verified; publish this exact draft after installation acceptance'

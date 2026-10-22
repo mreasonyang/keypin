@@ -87,5 +87,28 @@ ditto -x -k "$archive" "$signing_dir/extracted"
 python3 scripts/verify-package.py "$signing_dir/extracted/KeyPin.app" --release
 xcrun stapler validate "$signing_dir/extracted/KeyPin.app"
 spctl --assess --type execute --verbose=2 "$signing_dir/extracted/KeyPin.app"
-(cd "$out" && shasum -a 256 "$(basename "$archive")" appcast.xml > SHA256SUMS)
+python3 - "$signing_dir/notarization.json" "$app/Contents/Info.plist" "$out/verification.json" <<'PY'
+from pathlib import Path
+import json, os, plistlib, subprocess, sys
+notarization = json.loads(Path(sys.argv[1]).read_text())
+info = plistlib.loads(Path(sys.argv[2]).read_bytes())
+receipt = {
+    "schemaVersion": 1,
+    "tag": os.environ["RELEASE_TAG"],
+    "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+    "version": info["CFBundleShortVersionString"],
+    "build": info["CFBundleVersion"],
+    "architecture": "arm64",
+    "workflowURL": f'https://github.com/mreasonyang/keypin/actions/runs/{os.environ["GITHUB_RUN_ID"]}',
+    "notarization": {"id": notarization["id"], "status": notarization["status"]},
+    "checks": {
+        "developerID": True, "hardenedRuntime": True, "secureTimestamp": True,
+        "staple": True, "gatekeeper": True, "archiveExtraction": True,
+        "sparkleArchiveSignature": True, "sparkleFeedSignature": True,
+    },
+    "installationAcceptance": "pending",
+}
+Path(sys.argv[3]).write_text(json.dumps(receipt, indent=2) + "\n")
+PY
+(cd "$out" && shasum -a 256 "$(basename "$archive")" appcast.xml verification.json > SHA256SUMS)
 echo 'PASS: signed, notarized, stapled release ZIP and signed appcast verified'

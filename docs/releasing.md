@@ -17,7 +17,7 @@ https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml
 ## 两条 Actions 流程
 
 - **CI**：`main` 推送及 PR 运行测试、本地化、发布工具检查和开发包构建；产物标注 development，无 Apple 公证，未配置公钥时禁用更新。它不读取发布私钥。
-- **Release**：版本标签 `v*` 或手动选择已有版本标签，核对标签与 `Info.plist`，测试后构建、签名、公证、附加票据、验证 Gatekeeper、制作 ZIP、签署 appcast，最后发布 Release。凭据缺失或任一检查失败就停止，不能退回未签名正式发布。
+- **Release**：版本标签 `v*` 或手动选择已有版本标签，核对标签与 `Info.plist`，测试后构建、签名、公证、附加票据、验证 Gatekeeper、制作 ZIP、签署 appcast，最后保存为 Draft Release。完成最终包安装验收后，公开同一草稿。凭据缺失或任一检查失败就停止，不能退回未签名正式发布。
 
 Actions 使用 `macos-26`。本地可通过 `./scripts/ci.sh` 运行同一开发验证流程；正式发布由 GitHub 执行，不依赖维护者本机的钥匙串。
 
@@ -92,8 +92,8 @@ gh variable list --repo mreasonyang/keypin
 
 1. 在 `packaging/Info.plist` 更新 `CFBundleShortVersionString`，并递增 `CFBundleVersion`。提交到 `main`，等待 CI 通过。
 2. 对这个确定的提交创建匹配标签，如 `v0.0.15`，推送标签触发 Release。不要复用已发布标签或用相同构建号替换安装包。
-3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Release 应包含 `KeyPin-<version>-arm64.zip`、`SHA256SUMS` 和 `appcast.xml`。工作流先建立草稿，再下载已上传文件核对哈希，通过后才公开为最新正式版；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
-4. 从公开 Release 实际下载，验证校验和、首次启动、登录自启以及从上一版进行更新后的配置保留。开发包、单测或签名结果不替代这一步。
-5. 更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
+3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Draft Release 应包含 `KeyPin-<version>-arm64.zip`、`SHA256SUMS`、`appcast.xml` 和仅含公开验证结果的 `verification.json`。工作流建立草稿后重新下载已上传文件核对哈希，验收前保留草稿状态；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
+4. 使用 `gh release download v<version> --repo mreasonyang/keypin --dir <empty-directory>` 下载草稿，验证校验和、隔离属性下首次启动、登录自启、真实中文候选和跨 App 焦点。存在上一支持更新版本时，还要验证实际升级与配置保留。开发包、单测或签名结果不替代这一步。首个版本尚无公开更新源，检查更新返回无可用 feed 不能算作双版本升级验收。
+5. 安装验收通过后，用 `gh release edit v<version> --repo mreasonyang/keypin --draft=false --latest` 公开已验证的同一草稿。重新从公开 URL 下载核对 SHA-256，再更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
 
 在首次签名 Release 和两个版本间的实际升级验证完成前，不应宣称自动更新已通过生产验收。核心输入法、中文候选和跨 App 焦点验收仍按产品自身要求执行。
