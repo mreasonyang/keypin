@@ -36,6 +36,9 @@ security set-keychain-settings -lut 21600 "$keychain"
 security unlock-keychain -p "$keychain_password" "$keychain"
 security import "$certificate" -k "$keychain" -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security >/dev/null
 security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain" >/dev/null
+# codesign also requires a file-based identity's keychain in the user search
+# list. This is an ephemeral official runner; never change the local user's list.
+security list-keychains -d user -s "$keychain"
 unset MACOS_CERTIFICATE_PASSWORD keychain_password
 rm -f "$certificate"
 identity="$(security find-identity -v -p codesigning "$keychain" | python3 -c 'import os,re,sys; matches=re.findall(r"([A-Fa-f0-9]{40}) \"Developer ID Application: [^\"]+ \("+re.escape(os.environ["AC_TEAM_ID"])+r"\)\"",sys.stdin.read()); len(matches)==1 or sys.exit("Expected exactly one valid Developer ID Application identity for AC_TEAM_ID"); print(matches[0])')"
