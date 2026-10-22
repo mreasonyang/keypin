@@ -123,8 +123,7 @@ final class FocusProcessJob {
     }
 
     func start(id: String, automatic: Bool) throws {
-        let executable = Bundle.main.executableURL
-            ?? URL(fileURLWithPath: CommandLine.arguments[0]).resolvingSymlinksInPath()
+        let executable = try FocusHelperLocation.executable(in: L10n.appBundle)
         try start(executable: executable, arguments: ["focus", id] + (automatic ? ["--automatic"] : []))
     }
 

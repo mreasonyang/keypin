@@ -66,6 +66,7 @@ python3 "$root/scripts/configure-bundle.py" "$staged_app/Contents/Info.plist" "$
 cp "$root/LICENSE" "$staged_app/Contents/Resources/LICENSE"
 cp "$sparkle_license" "$staged_app/Contents/Resources/Sparkle-LICENSE"
 ditto "$framework" "$staged_app/Contents/Frameworks/Sparkle.framework"
+bash "$root/scripts/embed-focus-helper.sh" "$staged_app"
 for lang in en zh-Hans zh-Hant ja ko; do
   mkdir -p "$staged_app/Contents/Resources/$lang.lproj"
   cp "$root/packaging/$lang.lproj/"* "$staged_app/Contents/Resources/$lang.lproj/"

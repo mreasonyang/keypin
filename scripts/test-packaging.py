@@ -13,7 +13,7 @@ import tempfile
 
 
 APP_NAME = "KeyPin.app"
-PHASES = ("success", "first-install", "icon", "sign", "sign-downloader", "verify", "missing-framework", "framework-copy", "rpath", "retire", "publish", "published-error")
+PHASES = ("success", "first-install", "icon", "sign", "sign-downloader", "sign-helper", "verify", "missing-framework", "framework-copy", "rpath", "helper-embed", "helper-rpath", "retire", "publish", "published-error")
 
 
 def run_fixture(source: Path, base: Path, phase: str) -> None:
@@ -55,15 +55,23 @@ if [[ "$1" == "--verify" ]]; then
 else
   [[ "$FAIL_PHASE" != "sign" ]] || exit 63
   [[ "$FAIL_PHASE" != "sign-downloader" || "$*" != *Downloader.xpc* ]] || exit 67
+  [[ "$FAIL_PHASE" != "sign-helper" || "$*" != *"KeyPin Focus Helper.app"* ]] || exit 69
   echo "$*" >> "$FIXTURE_ROOT/sign-order"
 fi
 ''')
     (tools / "otool").write_text('''#!/bin/bash
 if [[ "$1" == -L ]]; then
   echo '@rpath/Sparkle.framework/Versions/B/Sparkle'
+elif [[ "$2" == *keypin-focus ]]; then
+  if [[ "$FAIL_PHASE" != "helper-rpath" ]]; then
+    echo '         path @executable_path/../../../../Frameworks (offset 12)'
+  fi
 elif [[ "$FAIL_PHASE" != "rpath" ]]; then
   echo '         path @executable_path/../Frameworks (offset 12)'
 fi
+''')
+    (tools / "install_name_tool").write_text('''#!/bin/bash
+[[ "$FAIL_PHASE" != "helper-embed" ]] || exit 70
 ''')
     (tools / "ditto").write_text('''#!/bin/bash
 [[ "$FAIL_PHASE" != "framework-copy" ]] || exit 68
@@ -119,8 +127,8 @@ exec /bin/mv "$@"
         assert (app / "Contents/Resources/Sparkle-LICENSE").read_text() == "Sparkle license fixture\n"
         assert (app / "Contents/Frameworks/Sparkle.framework/Versions/Current").is_symlink()
         signs = (fixture / "sign-order").read_text().splitlines()
-        assert len(signs) == 6, signs
-        assert all(name in line for name, line in zip(("Installer.xpc", "Downloader.xpc", "Autoupdate", "Updater.app", "Sparkle.framework", "KeyPin.app"), signs))
+        assert len(signs) == 7, signs
+        assert all(name in line for name, line in zip(("Installer.xpc", "Downloader.xpc", "Autoupdate", "Updater.app", "Sparkle.framework", "KeyPin Focus Helper.app", "KeyPin.app"), signs))
         assert "--preserve-metadata=entitlements" in signs[1]
         assert all("--deep" not in line for line in signs)
         assert not (app / "current-marker").exists()

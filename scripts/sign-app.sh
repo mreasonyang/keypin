@@ -16,5 +16,6 @@ codesign "${args[@]}" --preserve-metadata=entitlements "$version/XPCServices/Dow
 codesign "${args[@]}" "$version/Autoupdate"
 codesign "${args[@]}" "$version/Updater.app"
 codesign "${args[@]}" "$framework"
+codesign "${args[@]}" "$app/Contents/Helpers/KeyPin Focus Helper.app"
 codesign "${args[@]}" "$app"
 codesign --verify --deep --strict "$app"

@@ -130,3 +130,5 @@
 "about.update.reminder" = "版本 %@ 可用。打开「设置 → 关于 KeyPin」查看。";
 "about.update.failed" = "更新器未能启动，请重新打开 KeyPin 后再试。";
 "about.update.setup" = "请先完成 KeyPin 的初始设置，再检查更新。";
+"enf.helper-app-required" = "切换中日韩输入法需要完整的 KeyPin 应用，请使用已安装应用内的命令。";
+"enf.helper-unavailable" = "输入法切换助手缺失或无效，请重新安装 KeyPin。";

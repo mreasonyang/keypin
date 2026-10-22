@@ -1,7 +1,7 @@
 import Foundation
 import Darwin
 
-/// Only the long-lived GUI acquires this lock. Input-method helpers share its bundle ID.
+/// Only the long-lived GUI acquires this lock. The nested focus helper has a separate bundle ID.
 final class InstanceLock {
     private var descriptor: Int32 = -1
 

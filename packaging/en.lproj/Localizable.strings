@@ -130,3 +130,5 @@
 "about.update.reminder" = "Version %@ is available. Open Settings → About KeyPin to review.";
 "about.update.failed" = "The updater could not start. Reopen KeyPin to try again.";
 "about.update.setup" = "Finish setting up KeyPin before checking for updates.";
+"enf.helper-app-required" = "CJK input switching requires the packaged KeyPin app. Run the command inside the installed app.";
+"enf.helper-unavailable" = "The input switching helper is missing or invalid. Reinstall KeyPin.";

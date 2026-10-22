@@ -130,3 +130,5 @@
 "about.update.reminder" = "バージョン %@ が利用できます。「設定 → KeyPin について」で確認できます。";
 "about.update.failed" = "更新機能を開始できませんでした。KeyPin を開き直してお試しください。";
 "about.update.setup" = "KeyPin の初期設定を完了してからアップデートを確認してください。";
+"enf.helper-app-required" = "CJK 入力ソースの切り替えには、パッケージ版の KeyPin が必要です。インストール済みアプリ内のコマンドを使用してください。";
+"enf.helper-unavailable" = "入力切り替えヘルパーが見つからないか無効です。KeyPin を再インストールしてください。";

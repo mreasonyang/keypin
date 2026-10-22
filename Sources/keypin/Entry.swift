@@ -6,6 +6,15 @@ import Darwin
 enum Entry {
     static func main() {
         let arguments = Array(CommandLine.arguments.dropFirst())
+        switch FocusHelperInvocation.resolve(bundleIdentifier: Bundle.main.bundleIdentifier, arguments: arguments) {
+        case .focus(let sourceID):
+            FocusHelper.run(id: sourceID)
+        case .reject:
+            fputs("KeyPin's focus helper must be launched by the installed application.\n", stderr)
+            exit(EX_USAGE)
+        case .application:
+            break
+        }
         #if DEBUG
         if arguments.first == "preview" || (Bundle.main.bundleIdentifier?.hasPrefix("app.keypin.preview") == true) {
             let previewArguments = arguments.first == "preview" ? arguments : (Bundle.main.object(forInfoDictionaryKey: "KeyPinPreviewArguments") as? [String] ?? ["preview", "active", "zh-Hans", "light"])
@@ -15,10 +24,6 @@ enum Entry {
         }
         #endif
         L10n.languageCode = L10n.normalized(ConfigStore.load().language)
-        if arguments.first == "focus" {
-            let id = arguments.count > 1 ? arguments[1] : (ConfigStore.load().sourceID ?? "")
-            FocusHelper.run(id: id)
-        }
         // background：登录项悄悄留在菜单栏，不弹窗口。
         // gui，或从访达 / open 启动：菜单栏加上设置窗口。
         if arguments.first == "gui" || arguments.first == "background" {

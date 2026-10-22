@@ -15,6 +15,7 @@ cp "$sparkle_license" "$app/Contents/Resources/Sparkle-LICENSE"
 rm -rf "$app/Contents/Frameworks/Sparkle.framework"
 ditto "$framework" "$app/Contents/Frameworks/Sparkle.framework"
 python3 scripts/configure-bundle.py "$app/Contents/Info.plist" preview
+bash scripts/embed-focus-helper.sh "$app"
 for lang in en zh-Hans zh-Hant ja ko; do
   mkdir -p "$app/Contents/Resources/$lang.lproj"
   cp "packaging/$lang.lproj/Localizable.strings" "$app/Contents/Resources/$lang.lproj/"

@@ -38,15 +38,18 @@ Actions 使用 `macos-26`。本地可通过 `./scripts/ci.sh` 运行同一开发
 
 ### Apple 证书与公证
 
-1. 在「钥匙串访问 > 我的证书」中找到有效的 **Developer ID Application** 证书，展开并确认含私钥。导出该身份为 `.p12`，设置导出密码。Apple Development 证书不能用于这里的正式分发。
-2. 由维护者在自己的终端中上传 `.p12`，不要打印内容。例如：
+1. 打开 macOS「钥匙串访问」，选择左侧「登录」钥匙串，再选择「我的证书」。找到有效的 **Developer ID Application: 姓名或组织 (Team ID)**；Apple Development 证书不能用于这里的正式分发。
+2. 展开该证书左侧的小三角，确认下面有私钥。选中证书，使用「文件 > 导出项目…」，格式选择「个人信息交换 (.p12)」。如果只能导出 `.cer`，通常是没有选中含私钥的身份，或这台 Mac 没有该私钥；不要用 `.cer` 继续。
+3. 将文件保存到自己指定的临时路径，设置一个导出密码并妥善保存。macOS 可能要求输入本机登录密码以授权导出；这是钥匙串授权，与导出密码、Apple ID 密码不同。
+4. 在自己的终端中上传 `.p12`，将下面的路径替换为实际保存位置。命令将内容直接传给 GitHub，不打印证书内容：
 
    ```sh
    base64 -i /path/to/DeveloperID.p12 | gh secret set MACOS_CERTIFICATE_P12_BASE64 --repo mreasonyang/keypin
    ```
 
-3. 通过 GitHub Secrets 页面输入其余四项 Apple 凭据。App-specific Password 在 [Apple 账号](https://account.apple.com/) 中生成，不使用 Apple ID 登录密码。
-4. 导出的 `.p12` 保存在安全备份中，或在成功配置后删除临时导出文件。工作流将证书导入 runner 的临时钥匙串，并在结束时清理。
+5. 打开上面的 Actions Secrets 设置链接，逐项点击 **New repository secret**，填写名称和值并保存：`MACOS_CERTIFICATE_PASSWORD` 填第 3 步的导出密码；`AC_APPLE_ID` 填开发者账号邮箱；`AC_TEAM_ID` 填证书名称括号内的 Team ID。
+6. 登录 [Apple 账号](https://account.apple.com/)，在「登录和安全 > App 专用密码」中生成一个用于 KeyPin 公证的密码。将它保存为 `AC_PASSWORD`；不要填写 Apple ID 登录密码。
+7. 导出的 `.p12` 保存在安全备份中，或在成功配置后删除临时导出文件。工作流将证书导入 runner 的临时钥匙串，并在结束时清理。
 
 参考：[Apple 公证要求](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)、[GitHub Secrets](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions)。
 
@@ -76,7 +79,7 @@ swift package --disable-keychain --disable-netrc resolve
 )
 ```
 
-首次生成会请求钥匙串访问授权。使用独立的 `keypin` account，重复运行复用该密钥，不应每次发布重新生成。妥善备份更新签名密钥；密钥轮换必须按 [Sparkle 密钥轮换说明](https://sparkle-project.org/documentation/#changing-eddsa-keys) 规划，不能随意替换已发行应用信任的公钥。
+首次生成会请求钥匙串访问授权。使用独立的 `keypin` account，重复运行复用该密钥，不应每次发布重新生成。妥善备份更新签名密钥；密钥轮换必须按 [Sparkle 密钥轮换说明](https://sparkle-project.org/documentation/#rotating-signing-keys) 规划，不能随意替换已发行应用信任的公钥。当前使用 ZIP 且要求解压前验证签名，丢失 Ed25519 私钥后不能直接换新密钥继续发布 ZIP；恢复更新信任需要另行设计符合 Sparkle 要求的、Developer ID 签名的 DMG 迁移。
 
 仅检查名称是否齐全，可运行：
 
@@ -89,7 +92,7 @@ gh variable list --repo mreasonyang/keypin
 
 1. 在 `packaging/Info.plist` 更新 `CFBundleShortVersionString`，并递增 `CFBundleVersion`。提交到 `main`，等待 CI 通过。
 2. 对这个确定的提交创建匹配标签，如 `v0.0.15`，推送标签触发 Release。不要复用已发布标签或用相同构建号替换安装包。
-3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Release 应包含 `KeyPin-<version>-arm64.zip`、`SHA256SUMS` 和 `appcast.xml`；只有全部准备好后才作为最新正式版公开。
+3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Release 应包含 `KeyPin-<version>-arm64.zip`、`SHA256SUMS` 和 `appcast.xml`。工作流先建立草稿，再下载已上传文件核对哈希，通过后才公开为最新正式版；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
 4. 从公开 Release 实际下载，验证校验和、首次启动、登录自启以及从上一版进行更新后的配置保留。开发包、单测或签名结果不替代这一步。
 5. 更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
 
