@@ -1,0 +1,36 @@
+# SwiftPM build cache and local app packages
+/.build/
+/build/
+/DerivedData/
+/dist/
+
+# Xcode per-user state
+xcuserdata/
+*.xcuserstate
+
+# Python cache files from local checks
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS metadata
+.DS_Store
+._*
+
+# Local environment overrides; keep shareable examples
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Release credentials belong in Keychain / GitHub Actions secrets
+*.p12
+*.p8
+*.keychain
+*.keychain-db
+*.private-key
+
+# Editor swap and backup files
+*.swp
+*.swo
+*~
