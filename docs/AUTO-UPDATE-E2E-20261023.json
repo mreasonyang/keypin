@@ -1,0 +1,146 @@
+{
+  "recorded_at": "2026-10-23T04:40:09.179589+00:00",
+  "environment": {
+    "macOS": "27.0.1",
+    "architecture": "arm64",
+    "sparkle": "2.10.0"
+  },
+  "fixture": {
+    "sourceTag": "v0.0.16",
+    "sourceArchiveSHA256": "fdfe363910a90cedf8a0c1bafbb255f5db0c528b42d785ee0a3573bc45cfec3a",
+    "executableSHA256": "178992a728cc87212bbe801474aa8d09e3284a6b530af84698e900ef7e0b968d",
+    "feed": "https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml",
+    "publicVerificationKeyUnchanged": true,
+    "fixtureVersion": "0.0.15",
+    "fixtureBuild": "16",
+    "publishedTargetVersion": "0.0.16",
+    "publishedTargetBuild": "17",
+    "purpose": "Update installation fixture derived from the published executable; not a historical released 0.0.15 build.",
+    "createdAt": "2026-10-23T04:32:10.844883+00:00",
+    "archive": "KeyPin-update-fixture-0.0.15-16.zip",
+    "archiveSHA256": "a850c5c9e3933ace7cb27de244da36f9df3ed2622fabf8f2d5536bf9e57138f2",
+    "notarization": "Accepted",
+    "workflowURL": "https://github.com/mreasonyang/keypin/actions/runs/39900789252"
+  },
+  "manual_update": {
+    "phase": "manual",
+    "initial": {
+      "version": "0.0.15",
+      "build": "16",
+      "pids": [
+        33506
+      ]
+    },
+    "observations": [
+      {
+        "at": "2026-10-23T04:35:08.543083+00:00",
+        "version": "0.0.15",
+        "build": "16",
+        "pids": [
+          33506
+        ]
+      },
+      {
+        "at": "2026-10-23T04:35:11.969248+00:00",
+        "version": "0.0.15",
+        "build": "16",
+        "pids": []
+      },
+      {
+        "at": "2026-10-23T04:35:12.359921+00:00",
+        "version": "0.0.16",
+        "build": "17",
+        "pids": [
+          33815
+        ]
+      }
+    ],
+    "installed_and_restarted_without_observer_launch": true,
+    "installed": true,
+    "test_fixture_marker_removed": true,
+    "all_bundle_files_and_symlinks_match_published_app": true,
+    "signature_valid": true,
+    "gatekeeper_accepted": true,
+    "staple_valid": true,
+    "configuration_preserved": true,
+    "login_plist_preserved": true,
+    "cli_link_preserved": true,
+    "passed": true
+  },
+  "automatic_download": {
+    "checked_at": "2026-10-23T04:36:49.255650+00:00",
+    "manual_check_invoked": false,
+    "installed_version": "0.0.15",
+    "installed_build": "16",
+    "automatic_preferences": {
+      "SUEnableAutomaticChecks": "1",
+      "SUAutomaticallyUpdate": "1"
+    },
+    "cached_release_archives": [
+      {
+        "sha256": "fdfe363910a90cedf8a0c1bafbb255f5db0c528b42d785ee0a3573bc45cfec3a",
+        "bytes": 2409997,
+        "modified_after_automatic_start": true,
+        "created_after_automatic_start": true
+      }
+    ]
+  },
+  "automatic_installation": {
+    "phase": "automatic",
+    "initial": {
+      "version": "0.0.15",
+      "build": "16",
+      "pids": [
+        34037
+      ]
+    },
+    "observations": [
+      {
+        "at": "2026-10-23T04:36:49.498138+00:00",
+        "version": "0.0.15",
+        "build": "16",
+        "pids": [
+          34037
+        ]
+      },
+      {
+        "at": "2026-10-23T04:36:52.954141+00:00",
+        "version": "0.0.16",
+        "build": "17",
+        "pids": []
+      }
+    ],
+    "installed_and_restarted_without_observer_launch": null,
+    "installed": true,
+    "test_fixture_marker_removed": true,
+    "all_bundle_files_and_symlinks_match_published_app": true,
+    "signature_valid": true,
+    "gatekeeper_accepted": true,
+    "staple_valid": true,
+    "configuration_preserved": true,
+    "login_plist_preserved": true,
+    "cli_link_preserved": true,
+    "passed": true
+  },
+  "final": {
+    "checked_at": "2026-10-23T04:38:42.013857+00:00",
+    "version": "0.0.16",
+    "build": 17,
+    "running": true,
+    "state": "keeping",
+    "main_process_count": 1,
+    "configuration_restored": true,
+    "login_enabled": true,
+    "login_plist_preserved": true,
+    "cli_link_preserved": true,
+    "automatic_checks": false,
+    "automatic_downloads": false,
+    "final_manual_check_result": "up_to_date",
+    "passed": true
+  },
+  "original_login_job_restart_verified": true,
+  "product_code_changed": false,
+  "stable_release_or_feed_changed": false,
+  "scope": "The older-build fixture uses the published 0.0.16 executable with signed/notarized 0.0.15 (16) bundle metadata; this verifies update installation, not historical product data migrations.",
+  "passed": true
+}

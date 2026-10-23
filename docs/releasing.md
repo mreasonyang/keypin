@@ -96,4 +96,4 @@ gh variable list --repo mreasonyang/keypin
 4. 使用 `gh release download v<version> --repo mreasonyang/keypin --dir <empty-directory>` 下载草稿，验证校验和、隔离属性下首次启动、登录自启、真实中文候选和跨 App 焦点。存在上一支持更新版本时，还要验证实际升级与配置保留。开发包、单测或签名结果不替代这一步。首个版本尚无公开更新源，检查更新返回无可用 feed 不能算作双版本升级验收。
 5. 安装验收通过后，用 `gh release edit v<version> --repo mreasonyang/keypin --draft=false --latest` 公开已验证的同一草稿。重新从公开 URL 下载核对 SHA-256，再更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
 
-在首次签名 Release 和两个版本间的实际升级验证完成前，不应宣称自动更新已通过生产验收。核心输入法、中文候选和跨 App 焦点验收仍按产品自身要求执行。
+自动更新的本机完整链路已完成[实机验证](AUTO-UPDATE-E2E-20261023.md)：同一证书签名、公证的旧版测试基线更新到正式 0.0.16，覆盖手动下载安装并重启、后台自动下载与退出安装，以及配置和登录项保留。后续真实产品版本的数据迁移及其他系统环境仍需对应验证。核心输入法、中文候选和跨 App 焦点验收仍按产品自身要求执行。

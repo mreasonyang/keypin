@@ -82,5 +82,12 @@
       "sha256": "fdfe363910a90cedf8a0c1bafbb255f5db0c528b42d785ee0a3573bc45cfec3a"
     }
   },
-  "remaining_manual_validation": "See RELEASE-ACCEPTANCE-20261023.md; unperformed checks are not marked as passed."
+  "remaining_manual_validation": "See RELEASE-ACCEPTANCE-20261023.md; unperformed checks are not marked as passed.",
+  "update_installation_followup": {
+    "checked_at": "2026-10-23T04:38:42.013857+00:00",
+    "report": "AUTO-UPDATE-E2E-20261023.md",
+    "receipt": "AUTO-UPDATE-E2E-20261023.json",
+    "manual_and_automatic_paths_passed": true,
+    "older_build_test_fixture": true
+  }
 }
