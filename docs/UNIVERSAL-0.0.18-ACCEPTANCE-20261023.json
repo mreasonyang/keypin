@@ -57,7 +57,7 @@
     "nativeGUIStarted": true,
     "intelGUIStarted": true,
     "intelProductionFeedCheckPassed": true,
-    "quarantinedFirstLaunch": "not tested: OS denied adding quarantine attribute",
+    "quarantinedFirstLaunch": "passed using the actual quarantined website browser download",
     "physicalIntelMacTested": false,
     "fixtureUsed": false
   },
@@ -140,5 +140,18 @@
       "cliPreserved": true,
       "updateTrustPreserved": true
     }
+  },
+  "browserFirstLaunch": {
+    "browserZIPMatchesOfficialRelease": true,
+    "browserZIPQuarantined": true,
+    "extractedAppQuarantined": true,
+    "appleMalwareCheckClear": true,
+    "normalOpenConfirmationAccepted": true,
+    "appTranslocationObserved": true,
+    "guiStarted": true,
+    "version": "0.0.18",
+    "build": 19,
+    "securityProtectionsBypassed": false,
+    "testCopyClosed": true
   }
 }
