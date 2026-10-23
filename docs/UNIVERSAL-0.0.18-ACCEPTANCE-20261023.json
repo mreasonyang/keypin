@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-23",
+  "release": "v0.0.18",
+  "sourceCommit": "c704cc25ca390a359abc5b98689567f755cd9eee",
+  "ciURL": "https://github.com/mreasonyang/keypin/actions/runs/39931339307",
+  "releaseWorkflowURL": "https://github.com/mreasonyang/keypin/actions/runs/39932163542",
+  "localTestsPerArchitecture": 145,
+  "physicalIntelMacTested": false,
+  "publication": {
+    "published_at": "2026-10-23T09:39:33Z",
+    "tag": "v0.0.18",
+    "draft": false,
+    "url": "https://github.com/mreasonyang/keypin/releases/tag/v0.0.18",
+    "publicAssetsMatchDraft": true,
+    "latestFeedMatches": true,
+    "zip_sha256": "3ac1c7cc84f0ce86e8e71fe01b78bb70a45c0f8faf82783c32415250e1bf230b"
+  },
+  "package": {
+    "sha256": "3ac1c7cc84f0ce86e8e71fe01b78bb70a45c0f8faf82783c32415250e1bf230b",
+    "bytes": 3357308,
+    "version": "0.0.18",
+    "build": 19,
+    "checksumsMatch": true,
+    "checks": [
+      {
+        "architecture": "arm64",
+        "helpPassed": true,
+        "sourceEnumerationPassed": true,
+        "helperRejectedNormalInvocation": true
+      },
+      {
+        "architecture": "x86_64",
+        "helpPassed": true,
+        "sourceEnumerationPassed": true,
+        "helperRejectedNormalInvocation": true
+      }
+    ],
+    "package": true,
+    "feedMetadata": true,
+    "gatekeeper": true,
+    "stapledTicket": true,
+    "productionSignatures": true,
+    "universalComponents": [
+      "Contents/MacOS/keypin",
+      "Contents/Frameworks/Sparkle.framework/Autoupdate",
+      "Contents/Frameworks/Sparkle.framework/Sparkle",
+      "Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app/Contents/MacOS/Updater",
+      "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc/Contents/MacOS/Downloader",
+      "Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc/Contents/MacOS/Installer",
+      "Contents/Helpers/KeyPin Focus Helper.app/Contents/MacOS/keypin-focus"
+    ],
+    "inputSourceListsMatch": true
+  },
+  "signedGUI": {
+    "officialPackage": "0.0.18 (19)",
+    "nativeGUIStarted": true,
+    "intelGUIStarted": true,
+    "intelProductionFeedCheckPassed": true,
+    "quarantinedFirstLaunch": "not tested: OS denied adding quarantine attribute",
+    "physicalIntelMacTested": false,
+    "fixtureUsed": false
+  },
+  "automaticDownload": {
+    "phase": "quit",
+    "checked_at": "2026-10-23T09:40:13.259372+00:00",
+    "remote_release": "v0.0.18",
+    "remote_published_at": "2026-10-23T09:39:33Z",
+    "installed_version": "0.0.17",
+    "installed_build": "18",
+    "fixture_used": false,
+    "manual_check_invoked": false,
+    "automatic_preferences": {
+      "SUEnableAutomaticChecks": "1",
+      "SUAutomaticallyUpdate": "1"
+    },
+    "scheduled_check_recorded": true,
+    "downloaded_archives": [
+      {
+        "sha256": "3ac1c7cc84f0ce86e8e71fe01b78bb70a45c0f8faf82783c32415250e1bf230b",
+        "bytes": 3357308,
+        "created_after_start": true,
+        "created_after_remote_publication": true
+      }
+    ],
+    "signed_new_version_extracted_in_sparkle_cache": true,
+    "passed": true
+  },
+  "automaticInstallation": {
+    "phase": "quit",
+    "initial": {
+      "version": "0.0.17",
+      "build": "18",
+      "pids": [
+        98972
+      ]
+    },
+    "observations": [
+      {
+        "at": "2026-10-23T09:40:25.511295+00:00",
+        "version": "0.0.17",
+        "build": "18",
+        "pids": [
+          98972
+        ]
+      },
+      {
+        "at": "2026-10-23T09:40:30.454770+00:00",
+        "version": "0.0.18",
+        "build": "19",
+        "pids": []
+      }
+    ],
+    "installed": true,
+    "observer_started_application": false,
+    "no_fixture_marker": true,
+    "all_bundle_files_and_symlinks_match_public_0_0_18": true,
+    "signature_valid": true,
+    "gatekeeper_accepted": true,
+    "staple_valid": true,
+    "configuration_preserved": true,
+    "login_plist_preserved": true,
+    "cli_link_preserved": true,
+    "passed": true
+  },
+  "final": {
+    "automaticPreferencesRestored": true,
+    "oneInstalledMainProcess": true,
+    "testCopiesClosed": true,
+    "postUpgradeProductionFeedCheck": "0.0.18 is currently the newest version available",
+    "installedVerification": {
+      "version": "0.0.18",
+      "build": "19",
+      "matchesReference": true,
+      "codeSignature": true,
+      "gatekeeper": true,
+      "stapledTicket": true,
+      "configPreserved": true,
+      "loginPreserved": true,
+      "cliPreserved": true,
+      "updateTrustPreserved": true
+    }
+  }
+}

@@ -96,6 +96,8 @@ gh variable list --repo mreasonyang/keypin
 4. 使用 `gh release download v<version> --repo mreasonyang/keypin --dir <empty-directory>` 下载草稿，验证校验和、隔离属性下首次启动、登录自启、真实中文候选和跨 App 焦点。存在上一支持更新版本时，还要验证实际升级与配置保留。开发包、单测或签名结果不替代这一步。首个版本尚无公开更新源，检查更新返回无可用 feed 不能算作双版本升级验收。
 5. 安装验收通过后，用 `gh release edit v<version> --repo mreasonyang/keypin --draft=false --latest` 公开已验证的同一草稿。重新从公开 URL 下载核对 SHA-256，再更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
 
-正式版本间自动更新已完成[0.0.16 → 远程正式 0.0.17 的实机验证](REMOTE-AUTO-UPDATE-0.0.16-TO-0.0.17-20261023.md)：本机保留真实正式旧版，远程由 Actions 构建、签名、公证并公开新版，再通过同一生产 feed 自动发现、下载和退出安装；配置、登录项和 CLI 均保留。
+Universal 新版已完成 [0.0.17 → 0.0.18 的正式远程升级及双架构运行验收](UNIVERSAL-0.0.18-ACCEPTANCE-20261023.md)，Intel 运行证据来自 Rosetta。
+
+正式版本间自动更新也已完成[0.0.16 → 远程正式 0.0.17 的实机验证](REMOTE-AUTO-UPDATE-0.0.16-TO-0.0.17-20261023.md)：本机保留真实正式旧版，远程由 Actions 构建、签名、公证并公开新版，再通过同一生产 feed 自动发现、下载和退出安装；配置、登录项和 CLI 均保留。
 
 发布升级验收应使用真实公开的旧、新版本。修改本地版本元数据生成的测试基线仅可作为补充安装检查，不能代替正式远程升级验收。后续产品数据迁移及其他系统环境仍需对应验证；核心输入法、中文候选和跨 App 焦点验收按产品自身要求执行。
