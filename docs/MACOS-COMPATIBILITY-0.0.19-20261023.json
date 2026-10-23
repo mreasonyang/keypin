@@ -1,0 +1,160 @@
+{
+  "version": "0.0.19",
+  "build": 20,
+  "minimumMacOS": "13.0",
+  "sourceCommit": "ae9be589d435ca46ccef252b72e40257f385d2a4",
+  "tag": "v0.0.19",
+  "ciRun": "https://github.com/mreasonyang/keypin/actions/runs/39941198881",
+  "releaseRun": "https://github.com/mreasonyang/keypin/actions/runs/39942036974",
+  "ci": "passed",
+  "local": {
+    "macOS": "27.0.1",
+    "architecture": "arm64",
+    "nativeTests": 145,
+    "rosettaTests": 145,
+    "legacyPreviewRenders": 20,
+    "manualLegacyOnboardingAndPanel": "passed"
+  },
+  "olderRuntime": [
+    {
+      "passed": true,
+      "architecture": "x86_64",
+      "tests": 145,
+      "failures": 0
+    },
+    {
+      "passed": true,
+      "macOS": "15.7.9",
+      "architecture": "arm64",
+      "cli": true,
+      "helperRejectedCLI": true,
+      "renderedLegacyWindows": 20
+    },
+    {
+      "passed": true,
+      "macOS": "15.7.9",
+      "architecture": "x86_64",
+      "cli": true,
+      "helperRejectedCLI": true,
+      "renderedLegacyWindows": 20
+    },
+    {
+      "nativeTests": 145,
+      "failures": 0
+    }
+  ],
+  "notTested": [
+    "macOS 13 runtime",
+    "macOS 14 runtime",
+    "physical Intel user Mac",
+    "full real CJK composition and cross-app input regression"
+  ],
+  "release": "published",
+  "publication": {
+    "release": {
+      "isDraft": false,
+      "isPrerelease": false,
+      "publishedAt": "2026-10-23T11:03:01Z",
+      "url": "https://github.com/mreasonyang/keypin/releases/tag/v0.0.19"
+    },
+    "assets": [
+      {
+        "file": "KeyPin-0.0.19-universal.zip",
+        "bytes": 3391606,
+        "sha256": "debed27184c7c8c72fec80be4c5d9be8a30910d0d418ab96b73a96b1acf046fd"
+      },
+      {
+        "file": "appcast.xml",
+        "bytes": 1260,
+        "sha256": "aa6210c44a689c573fed96d49c6aaebe29b9883cec78505442fa0ccdb4c10033"
+      },
+      {
+        "file": "SHA256SUMS",
+        "bytes": 256,
+        "sha256": "94d1a14ccdd277934a404477b8094ef52ac13e947af6527e0c90991382e657c9"
+      },
+      {
+        "file": "verification.json",
+        "bytes": 693,
+        "sha256": "6b0ab3a5c2e4ab0194fdcf8cf5e6dbd8846f75a16d2db05ce77ff136d87a33fa"
+      }
+    ],
+    "latestFeedMatches": true
+  },
+  "verification": {
+    "schemaVersion": 1,
+    "tag": "v0.0.19",
+    "commit": "ae9be589d435ca46ccef252b72e40257f385d2a4",
+    "version": "0.0.19",
+    "build": "20",
+    "architecture": "universal",
+    "architectures": [
+      "arm64",
+      "x86_64"
+    ],
+    "workflowURL": "https://github.com/mreasonyang/keypin/actions/runs/39942036974",
+    "notarization": {
+      "id": "11cc353f-129f-4ba1-9033-d764058873a5",
+      "status": "Accepted"
+    },
+    "checks": {
+      "developerID": true,
+      "hardenedRuntime": true,
+      "secureTimestamp": true,
+      "staple": true,
+      "gatekeeper": true,
+      "archiveExtraction": true,
+      "sparkleArchiveSignature": true,
+      "sparkleFeedSignature": true
+    },
+    "installationAcceptance": "pending",
+    "installationAcceptanceNote": "The immutable build receipt remains unchanged; installation results are recorded separately in this report."
+  },
+  "upgrade": {
+    "fromVersion": "0.0.18",
+    "toVersion": "0.0.19",
+    "build": "20",
+    "minimumMacOS": "13.0",
+    "mechanism": "production Sparkle feed; Check for Updates, Install Update, Install and Relaunch",
+    "installedFilesMatchSignedRelease": true,
+    "preserved": {
+      "config": true,
+      "login": true,
+      "cli": true
+    },
+    "automaticUpdatePreferencesPreserved": true,
+    "relaunchGUI": "passed"
+  },
+  "signedPackageGUI": "passed; About shows 0.0.19 (20), macOS 13.0 or later",
+  "website": {
+    "sourceCommit": "e87de926c9c97e159274c22e5f3ae10e36bd98f8",
+    "ciRun": "https://github.com/mreasonyang/keypin-site/actions/runs/39943700115",
+    "status": "production-verified",
+    "deploymentId": "7bc8f618-ce1b-4410-af26-b275cdf4e4c2",
+    "publicFilesVerified": 23,
+    "ci": "passed",
+    "cloudflare": "passed",
+    "browserDownloads": [
+      {
+        "locale": "zh-Hans",
+        "bytes": 3391606,
+        "sha256": "debed27184c7c8c72fec80be4c5d9be8a30910d0d418ab96b73a96b1acf046fd",
+        "quarantineAttributePresent": true
+      },
+      {
+        "locale": "en",
+        "bytes": 3391606,
+        "sha256": "debed27184c7c8c72fec80be4c5d9be8a30910d0d418ab96b73a96b1acf046fd",
+        "quarantineAttributePresent": true
+      },
+      {
+        "locale": "zh-Hant",
+        "bytes": 3391606,
+        "sha256": "debed27184c7c8c72fec80be4c5d9be8a30910d0d418ab96b73a96b1acf046fd",
+        "quarantineAttributePresent": true
+      }
+    ]
+  },
+  "updateIdentityPreserved": true,
+  "status": "release-and-upgrade-passed; macOS 13/14 runtime acceptance outstanding"
+}
