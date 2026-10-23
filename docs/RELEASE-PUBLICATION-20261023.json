@@ -1,0 +1,86 @@
+{
+  "recorded_at": "2026-10-23T03:51:30.217658+00:00",
+  "release": {
+    "tag": "v0.0.16",
+    "url": "https://github.com/mreasonyang/keypin/releases/tag/v0.0.16",
+    "published_at": "2026-10-23T03:47:35Z",
+    "latest_stable": true
+  },
+  "anonymous_release_assets": [
+    {
+      "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.16/KeyPin-0.0.16-arm64.zip",
+      "status": 200,
+      "bytes": 2409997,
+      "sha256": "fdfe363910a90cedf8a0c1bafbb255f5db0c528b42d785ee0a3573bc45cfec3a",
+      "matches_signed_release": true
+    },
+    {
+      "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.16/appcast.xml",
+      "status": 200,
+      "bytes": 1335,
+      "sha256": "6bf2e9d3484bc0ff866b02ffd2cfcba1cef1887e96b97dc9cfe4c6a3c869c39e",
+      "matches_signed_release": true
+    },
+    {
+      "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.16/SHA256SUMS",
+      "status": 200,
+      "bytes": 252,
+      "sha256": "1307bf34b50dc62441338df1e833edb53a286c39edfad35b1fc2254abc5f8cb7",
+      "matches_signed_release": true
+    },
+    {
+      "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.16/verification.json",
+      "status": 200,
+      "bytes": 637,
+      "sha256": "4e63bb449dfafef12203ed3df6f8f14ba348cddb86262ed277d9dd3a5bf44749",
+      "matches_signed_release": true
+    }
+  ],
+  "fixed_appcast": {
+    "url": "https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml",
+    "status": 200,
+    "matches_signed_release": true,
+    "build": 17,
+    "version": "0.0.16"
+  },
+  "installed_app_update_check": {
+    "version": "0.0.16",
+    "build": 17,
+    "result": "up_to_date",
+    "automatic_checks_enabled": false,
+    "automatic_downloads_enabled": false,
+    "two_version_upgrade_tested": false
+  },
+  "website": {
+    "url": "https://keypin.kyun.si/",
+    "source_commit": "e12beae40fdfc12e44219645409b463333f0fc55",
+    "cloudflare_deployment_id": "22920432-f850-440b-b7bb-7f3cf723ee53",
+    "github_validation": "https://github.com/mreasonyang/keypin-site/actions/runs/39897018451",
+    "anonymous_verification": [
+      {
+        "origin": "https://keypin.kyun.si",
+        "passed": true,
+        "public_files_checked": 17,
+        "checked_at": "2026-10-23T03:50:22.797447+00:00"
+      },
+      {
+        "origin": "https://keypin-site.pages.dev",
+        "passed": true,
+        "public_files_checked": 17,
+        "checked_at": "2026-10-23T03:50:22.209315+00:00"
+      }
+    ],
+    "download": {
+      "version": "0.0.16",
+      "build": 17,
+      "minimumMacOS": "26.0",
+      "architecture": "arm64",
+      "signing": "Developer ID",
+      "notarized": true,
+      "download": "/downloads/KeyPin-0.0.16-arm64.zip",
+      "bytes": 2409997,
+      "sha256": "fdfe363910a90cedf8a0c1bafbb255f5db0c528b42d785ee0a3573bc45cfec3a"
+    }
+  },
+  "remaining_manual_validation": "See RELEASE-ACCEPTANCE-20261023.md; unperformed checks are not marked as passed."
+}
