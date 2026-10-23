@@ -30,6 +30,7 @@
 - CLI 入口已迁移到 Applications 中的已安装应用。输入法目标、保持开关、语言和引导标记与测试前一致。
 - 真实 Secure Input：聚焦 Brave 本地测试页的空白密码字段后，CLI 状态为 `secure_input`，`apply --json` 返回同名错误；移开焦点后恢复 `keeping`。测试未输入密码。
 - 真实面板选择：ABC 和 Squirrel 之间切换后，面板及系统输入源 ID 一致；从 ABC 回到 Squirrel 时签名焦点 helper 正常完成。此证据只确认输入源切换，不证明中文候选和组合输入正常。
+- 中文输入对照探针：对最终安装包保持开启与暂停两种状态，均在新建 TextEdit 文稿中通过电脑交互工具逐键发送 `n`、`i`；两组都只得到 ASCII `ni` 和系统英文建议，没有触发中文候选。测试后已恢复保持开启，Squirrel 目标和登录项不变。该对照说明当前自动化路径不能提供中文输入验收证据；它既不是中文输入通过的证据，也不足以认定是 KeyPin 缺陷。对照文稿保存于本机忽略的 `dist/release-acceptance-20261023/input-probe-control-20261023.rtf`。
 - 原生更新入口可启动 Sparkle。由于没有公开 stable Release，固定 latest feed 尚不可用，界面显示可取消的更新获取错误；取消后关于页恢复。这不是成功获取 feed、更新安装或升级验收。
 
 ## 仍需验收
@@ -42,7 +43,7 @@
 | 真实登录 | launchd 任务启动通过；注销再登录和重启未执行 |
 | macOS 26 GUI | 云端 macOS 26 构建测试通过，本机 GUI 为 macOS 27.0.1；最低系统的 GUI 尚未验收 |
 | 版本间升级 | 未完成。需要两个正式签名版本，以及真实下载、替换、重启和配置 / 登录项保留；不能用单测、签名校验或当前 feed 获取错误替代 |
-| 公开分发与官网 | Release 为 Draft。官网生产站点仍提供 1.13 (14)。三语言新版和同一 ZIP 已在 `keypin-site` 的本地 `release/keypin-0.0.16` 分支准备并通过静态检查，尚未推送部署；本地预览完成下载区域目视检查 |
+| 公开分发与官网 | Release 为 Draft，官网生产站点仍提供 1.13 (14)。三语言新版和同一 ZIP 已推送至 `keypin-site` 的 `release/keypin-0.0.16` 分支，提交 `e7c8805e63d3cd4479e24418669332092c37eb3f`。[GitHub 云端构建、检查和打包](https://github.com/mreasonyang/keypin-site/actions/runs/39890369224)通过，Cloudflare 预览部署成功；[新版预览](https://3aa0d6cb.keypin-site.pages.dev)的 17 个公开文件匿名核验全部通过，包含真实 ZIP 与校验和。尚未合入生产 `main` |
 
 ## 本轮修复与后续动作
 
