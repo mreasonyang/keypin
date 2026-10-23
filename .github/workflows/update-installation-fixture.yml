@@ -1,0 +1,39 @@
+name: Build update installation fixture
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keypin-update-fixture
+  cancel-in-progress: false
+
+jobs:
+  fixture:
+    if: github.repository == 'mreasonyang/keypin'
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Sign and notarize an older-build fixture for the published update
+        env:
+          MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          AC_APPLE_ID: ${{ secrets.AC_APPLE_ID }}
+          AC_TEAM_ID: ${{ secrets.AC_TEAM_ID }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+        run: bash scripts/build-update-fixture.sh
+      - name: Always remove temporary signing material
+        if: always()
+        run: bash scripts/cleanup-release.sh
+      - name: Upload test fixture, never a Release or update feed
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: KeyPin-update-fixture-${{ github.run_id }}
+          path: build/update-fixture/
+          if-no-files-found: error
+          retention-days: 3
