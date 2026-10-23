@@ -30,6 +30,7 @@ final class AppController: NSObject, NSApplicationDelegate {
     var previewAbout = false
     var previewCompact = false
     var previewReduced = false
+    var previewLegacyAppearance = false
     var previewPopover = false
     var previewHeight: CGFloat?
 
@@ -92,7 +93,8 @@ final class AppController: NSObject, NSApplicationDelegate {
 
     private func configurePopover() {
         let host = NSHostingController(rootView: Panel(model: model, updates: updates, inWindow: false, maximumHeight: maximumPanelHeight)
-            .environment(\.previewReduceTransparency, previewReduced))
+            .environment(\.previewReduceTransparency, previewReduced)
+            .environment(\.previewLegacyAppearance, previewLegacyAppearance))
         // The panel measures itself; the popover follows its ideal height as pages change.
         host.sizingOptions = [.preferredContentSize]
         popover.contentViewController = host
@@ -194,7 +196,7 @@ final class AppController: NSObject, NSApplicationDelegate {
         model.refreshSourceArtwork()
         model.refreshLogin()
         // 附属应用的弹出层如果不成为关键窗口，开关会画成灰色，看起来像关着。
-        NSApp.activate()
+        activateApplication()
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
     }
@@ -204,9 +206,10 @@ final class AppController: NSObject, NSApplicationDelegate {
             let page: PanelPage = previewAbout ? .about : (previewSettings ? .settings : .main)
             let host = NSHostingController(rootView: Panel(model: model, updates: updates, inWindow: !previewCompact, page: page,
                                                           maximumHeight: maximumPanelHeight)
-                .environment(\.previewReduceTransparency, previewReduced))
+                .environment(\.previewReduceTransparency, previewReduced)
+                .environment(\.previewLegacyAppearance, previewLegacyAppearance))
             // The shared header already reserves space for window controls. Don't add a second title-bar inset.
-            host.safeAreaRegions = []
+            if #available(macOS 13.3, *) { host.safeAreaRegions = [] }
             // Fit the window to the panel's ideal size and follow it when pages change.
             host.sizingOptions = [.minSize, .intrinsicContentSize, .maxSize]
             let window = NSWindow(contentViewController: host)
@@ -225,8 +228,13 @@ final class AppController: NSObject, NSApplicationDelegate {
         }
         model.refreshSourceArtwork()
         model.refreshLogin()
-        NSApp.activate()
+        activateApplication()
         panelWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    private func activateApplication() {
+        if #available(macOS 14.0, *) { NSApp.activate() }
+        else { NSApp.activate(ignoringOtherApps: true) }
     }
 
 }

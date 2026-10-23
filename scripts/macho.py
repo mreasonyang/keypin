@@ -49,5 +49,54 @@ def label(names: frozenset[str]) -> str:
     return "universal" if names == frozenset(("arm64", "x86_64")) else next(iter(names))
 
 
+def minimum_system_versions(data: bytes) -> dict[str, tuple[int, int, int]]:
+    """Read deployment targets from every slice, including embedded updater code."""
+    names = architectures(data)  # Validate the fat table before following offsets.
+    magic = data[:4]
+    if magic in FAT:
+        endian, wide = FAT[magic]
+        count = struct.unpack_from(endian + "I", data, 4)[0]
+        result = {}
+        for index in range(count):
+            entry = 8 + index * (32 if wide else 20)
+            offset, size = struct.unpack_from(endian + ("QQ" if wide else "II"), data, entry + 8)
+            result.update(minimum_system_versions(data[offset:offset + size]))
+        return result
+    if len(data) < 32:
+        raise ValueError("Truncated Mach-O load-command header")
+    endian = THIN[magic]
+    count, size = struct.unpack_from(endian + "II", data, 16)
+    end = 32 + size
+    if end > len(data) or count > size // 8:
+        raise ValueError("Invalid Mach-O load-command table")
+    offset, versions = 32, []
+    for _ in range(count):
+        if offset + 8 > end:
+            raise ValueError("Truncated Mach-O load command")
+        command, length = struct.unpack_from(endian + "II", data, offset)
+        if length < 8 or offset + length > end:
+            raise ValueError("Invalid Mach-O load-command size")
+        if command == 0x32:  # LC_BUILD_VERSION
+            if length < 24 or struct.unpack_from(endian + "I", data, offset + 8)[0] != 1:
+                raise ValueError("Expected a macOS build-version command")
+            versions.append(struct.unpack_from(endian + "I", data, offset + 12)[0])
+        elif command == 0x24:  # LC_VERSION_MIN_MACOSX
+            if length < 16:
+                raise ValueError("Truncated macOS deployment target")
+            versions.append(struct.unpack_from(endian + "I", data, offset + 8)[0])
+        offset += length
+    if offset != end or len(versions) != 1:
+        raise ValueError("Expected exactly one macOS deployment target")
+    version = versions[0]
+    return {next(iter(names)): (version >> 16, (version >> 8) & 255, version & 255)}
+
+
+def version_tuple(value: str) -> tuple[int, int, int]:
+    parts = tuple(map(int, value.split(".")))
+    if not 1 <= len(parts) <= 3 or any(part < 0 for part in parts):
+        raise ValueError("Invalid macOS version")
+    return parts + (0,) * (3 - len(parts))
+
+
 if __name__ == "__main__":
     print(label(architectures(Path(sys.argv[1]).read_bytes())))

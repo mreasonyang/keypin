@@ -4,7 +4,7 @@
 
 ## 构建与验证
 
-需要带 macOS 26 SDK 的 Xcode / Swift。以下命令均在项目根目录运行。
+运行系统要求 macOS 13+；构建仍需要带 macOS 26 SDK 的 Xcode / Swift，以编译带可用性保护的 Liquid Glass 界面。以下命令均在项目根目录运行。
 
 ```sh
 KEYPIN_ARCH=universal ./scripts/ci.sh
@@ -48,7 +48,9 @@ KEYPIN_ARCH=universal ./scripts/ci.sh
 
 本地化检查同时拒绝缺失键和未引用键。
 
-源码测试、打包验证、已安装应用和真实跨 App 输入验收不能互相替代。
+在预览命令末尾添加 `legacy` 可检查旧系统使用的材质和按钮；`--smoke-test` 会在完成窗口渲染后退出。GitHub CI 还把 macOS 26 构建的同一份 Universal 包放到 macOS 15 的 arm64 与 x86_64 runner 上运行 CLI、辅助程序入口及五语言明暗界面。macOS 13/14 仍需实际系统验收。
+
+打包校验读取每个 Mach-O 架构的最低系统版本，拒绝主程序、辅助程序或 Sparkle 组件高于应用声明的系统要求。源码测试、打包验证、已安装应用和真实跨 App 输入验收不能互相替代。
 
 ## 文档维护
 

@@ -6,7 +6,7 @@
 
 KeyPin is a lightweight macOS menu bar utility that helps keep your preferred input source active across apps. When switching between applications—such as moving between code editors, terminals, browsers, and chats—KeyPin detects input source changes and attempts to switch back to your designated target, reducing accidental language switches.
 
-> **Requirements**: macOS 26 or later on Apple silicon or Intel Mac. The Universal download includes both architectures. Native Liquid Glass interface with support for Simplified Chinese, Traditional Chinese, English, Japanese, and Korean.
+> **Requirements**: macOS 13 or later on Apple silicon or Intel Mac. The Universal download includes both architectures. Liquid Glass on macOS 26+, with native materials and buttons on earlier systems. Supports Simplified Chinese, Traditional Chinese, English, Japanese, and Korean.
 
 [Website](https://keypin.kyun.si) · [Releases and Downloads](https://github.com/mreasonyang/keypin/releases) · [Report an Issue](https://github.com/mreasonyang/keypin/issues)
 

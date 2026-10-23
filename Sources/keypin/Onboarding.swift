@@ -117,7 +117,7 @@ struct OnboardingView: View {
                 Button { model.setupStep = 0 } label: {
                     Image(systemName: "chevron.left").font(.system(size: 12, weight: .semibold)).frame(height: 18)
                 }
-                .buttonStyle(.glass)
+                .modifier(SetupButtonStyle())
                 .controlSize(.large)
                 .help(L10n.text("ui.back"))
                 .accessibilityLabel(L10n.text("ui.back"))
@@ -133,7 +133,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 6)
                     .frame(height: 18)
             }
-            .buttonStyle(.glassProminent)
+            .modifier(SetupButtonStyle(prominent: true))
             .controlSize(.large)
             .disabled(!model.canFinishSetup)
             .keyboardShortcut(.defaultAction)
@@ -175,7 +175,7 @@ struct StepDots: View {
                     .frame(width: index == step ? 16 : 6, height: 6)
             }
         }
-        .animation(reduceMotion ? nil : .snappy(duration: 0.2), value: step)
+        .animation(reduceMotion ? nil : .panelTransition(duration: 0.2), value: step)
         .accessibilityElement()
         .accessibilityLabel(L10n.format("setup.progress", step + 1))
         .accessibilityIdentifier("setup-progress")

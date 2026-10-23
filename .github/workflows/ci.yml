@@ -36,3 +36,37 @@ jobs:
           path: build/development/*
           if-no-files-found: error
           retention-days: 14
+      - name: Build isolated Universal preview for older-system runtime checks
+        run: |
+          bash scripts/preview.sh --build-only
+          ditto -c -k --sequesterRsrc --keepParent "build/KeyPin Preview.app" build/KeyPin-preview-universal.zip
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: KeyPin-preview-${{ github.sha }}
+          path: build/KeyPin-preview-universal.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  older-system-runtime:
+    needs: test-and-package
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: KeyPin-*-${{ github.sha }}
+          path: build/downloaded
+          merge-multiple: true
+      - name: Run the macOS 26-built packages on older macOS
+        run: |
+          ditto -x -k build/downloaded/KeyPin-development-universal.zip build/runtime
+          ditto -x -k build/downloaded/KeyPin-preview-universal.zip build/runtime
+          python3 scripts/verify-package.py build/runtime/KeyPin.app --architecture universal
+          python3 scripts/test-runtime.py build/runtime/KeyPin.app "build/runtime/KeyPin Preview.app"

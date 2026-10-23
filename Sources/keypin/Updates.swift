@@ -7,7 +7,7 @@ struct AppBuildInfo: Sendable {
     let build: Int?
     let minimumSystemVersion: String
 
-    init(version: String?, build: Int?, minimumSystemVersion: String = "26.0") {
+    init(version: String?, build: Int?, minimumSystemVersion: String = "13.0") {
         self.version = version
         self.build = build
         self.minimumSystemVersion = minimumSystemVersion
@@ -16,7 +16,7 @@ struct AppBuildInfo: Sendable {
     init(bundle: Bundle) {
         version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
         build = (bundle.object(forInfoDictionaryKey: "CFBundleVersion") as? String).flatMap(Int.init)
-        minimumSystemVersion = bundle.object(forInfoDictionaryKey: "LSMinimumSystemVersion") as? String ?? "26.0"
+        minimumSystemVersion = bundle.object(forInfoDictionaryKey: "LSMinimumSystemVersion") as? String ?? "13.0"
     }
 
     static var architecture: String {

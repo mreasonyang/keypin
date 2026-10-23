@@ -1,6 +1,6 @@
 # GitHub 发布与自动更新
 
-仓库：[mreasonyang/keypin](https://github.com/mreasonyang/keypin)。发行范围是 macOS 26+、Apple silicon 与 Intel，使用同一个 Universal ZIP。代码、版本标签、Actions 和 Release 均在这个仓库管理。
+仓库：[mreasonyang/keypin](https://github.com/mreasonyang/keypin)。发行范围是 macOS 13+、Apple silicon 与 Intel，使用同一个 Universal ZIP。代码、版本标签、Actions 和 Release 均在这个仓库管理。
 
 ## 更新机制
 
@@ -19,7 +19,9 @@ https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml
 - **CI**：`main` 推送及 PR 运行测试、本地化、发布工具检查和开发包构建；产物标注 development，无 Apple 公证，未配置公钥时禁用更新。它不读取发布私钥。
 - **Release**：版本标签 `v*` 或手动选择已有版本标签，核对标签与 `Info.plist`，测试后构建、签名、公证、附加票据、验证 Gatekeeper、制作 ZIP、签署 appcast，最后保存为 Draft Release。完成最终包安装验收后，公开同一草稿。凭据缺失或任一检查失败就停止，不能退回未签名正式发布。
 
-Actions 使用 `macos-26`，显式安装 Rosetta 并执行原生与 Intel 两组测试。本地可通过 `KEYPIN_ARCH=universal ./scripts/ci.sh` 运行同一开发验证流程；正式发布由 GitHub 执行，不依赖维护者本机的钥匙串。Rosetta 运行结果与 Intel 真机验收分别记录。
+Actions 使用 `macos-26`，显式安装 Rosetta 并执行原生与 Intel 两组测试。CI 还在 macOS 15 的 Apple silicon 和 Intel runner 上运行同一构建产物，检查旧系统的窗口与按钮回退。macOS 13/14 的实机交互验收仍需单独记录。
+
+本地可通过 `KEYPIN_ARCH=universal ./scripts/ci.sh` 运行同一开发验证流程；正式发布由 GitHub 执行，不依赖维护者本机的钥匙串。Rosetta 运行结果与 Intel 真机验收分别记录。
 
 ## 维护者一次性配置
 

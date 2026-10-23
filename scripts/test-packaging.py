@@ -29,6 +29,10 @@ def run_fixture(source: Path, base: Path, phase: str) -> None:
 THIN, FAT = {}, {}
 def architectures(data):
     return frozenset(("arm64", "x86_64")) if os.environ.get("KEYPIN_ARCH") == "universal" and os.environ["FAIL_PHASE"] != "missing-intel" else frozenset(("arm64",))
+def minimum_system_versions(data):
+    return {cpu: (13, 0, 0) for cpu in architectures(data)}
+def version_tuple(value):
+    return tuple(map(int, value.split("."))) + (0,)
 ''')
     (tools / "swift").write_text('''#!/bin/bash
 set -euo pipefail

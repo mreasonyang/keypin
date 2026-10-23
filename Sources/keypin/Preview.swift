@@ -6,6 +6,7 @@ import SwiftUI
 /// A separate debug-only process with in-memory services; never starts Enforcer or Agent.
 @MainActor
 enum Preview {
+    private static var launchObserver: NSObjectProtocol?
     @MainActor
     final class Store {
         var config: Config
@@ -149,18 +150,40 @@ enum Preview {
         }
         controller.previewCompact = arguments.contains("compact")
         controller.previewReduced = appearance == "reduced"
+        controller.previewLegacyAppearance = arguments.contains("legacy")
         controller.previewPopover = arguments.contains("popover")
         controller.previewHeight = arguments.contains("short") ? 420 : nil
-        if state == "first-confirm" {
-            let model = controller.model
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                model.setupSourceID = "demo.squirrel"
-                model.setupStep = 1
-            }
-        }
         configureTransitions(state: state, store: store, model: controller.model)
         controller.openWindowOnLaunch = true
         NSApplication.shared.appearance = NSAppearance(named: appearance == "dark" ? .darkAqua : .aqua)
+        if state == "first-confirm" || arguments.contains("--smoke-test") {
+            // Exercise real window creation and layout on CI's older macOS runtime.
+            // This entry point only exists in debug builds with in-memory services.
+            launchObserver = NotificationCenter.default.addObserver(
+                forName: NSApplication.didFinishLaunchingNotification, object: nil, queue: .main
+            ) { _ in
+                if let launchObserver { NotificationCenter.default.removeObserver(launchObserver) }
+                launchObserver = nil
+                DispatchQueue.main.async {
+                    if state == "first-confirm" {
+                        controller.model.setupSourceID = "demo.squirrel"
+                        controller.model.setupStep = 1
+                    }
+                    guard arguments.contains("--smoke-test") else { return }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        guard let window = NSApp.windows.first(where: { $0.isVisible && $0.styleMask.contains(.titled) }),
+                              let view = window.contentView,
+                              view.bounds.width >= 300, view.bounds.height >= 100,
+                              view.bounds.height <= 900 else { exit(1) }
+                        view.layoutSubtreeIfNeeded()
+                        guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { exit(2) }
+                        view.cacheDisplay(in: view.bounds, to: bitmap)
+                        print("PASS: preview window rendered")
+                        exit(0)
+                    }
+                }
+            }
+        }
     }
 
     /// Only the debug preview can inject this in-memory driver. No Sparkle object,

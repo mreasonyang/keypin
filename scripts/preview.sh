@@ -2,16 +2,22 @@
 set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root"
-swift build --disable-keychain --disable-netrc
-binary_dir="$(swift build --disable-keychain --disable-netrc --show-bin-path)"
+build_args=(--disable-keychain --disable-netrc)
+case "${KEYPIN_ARCH:-$(uname -m)}" in
+  universal) build_args+=(--arch arm64 --arch x86_64) ;;
+  arm64|x86_64) build_args+=(--arch "${KEYPIN_ARCH:-$(uname -m)}") ;;
+  *) echo 'Unsupported preview architecture' >&2; exit 2 ;;
+esac
+swift build "${build_args[@]}"
+binary_dir="$(swift build "${build_args[@]}" --show-bin-path)"
 framework="$(python3 scripts/sparkle-path.py framework "$binary_dir")"
 sparkle_license="$(python3 scripts/sparkle-path.py license "$binary_dir")"
 app="$root/build/KeyPin Preview.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$app/Contents/Frameworks"
 cp "$binary_dir/keypin" "$app/Contents/MacOS/keypin"
 cp packaging/Info.plist "$app/Contents/Info.plist"
-cp LICENSE "$app/Contents/Resources/LICENSE"
-cp "$sparkle_license" "$app/Contents/Resources/Sparkle-LICENSE"
+cp -f LICENSE "$app/Contents/Resources/LICENSE"
+cp -f "$sparkle_license" "$app/Contents/Resources/Sparkle-LICENSE"
 rm -rf "$app/Contents/Frameworks/Sparkle.framework"
 ditto "$framework" "$app/Contents/Frameworks/Sparkle.framework"
 python3 scripts/configure-bundle.py "$app/Contents/Info.plist" preview
@@ -24,5 +30,5 @@ swift "$root/packaging/make-icon.swift" "$app/Contents/Resources/AppIcon.icns"
 bash scripts/sign-app.sh "$app"
 python3 scripts/verify-package.py "$app"
 if [[ "${1:-}" != "--build-only" ]]; then
-  "$app/Contents/MacOS/keypin" preview "${1:-active}" "${2:-zh-Hans}" "${3:-light}" "${4:-}"
+  "$app/Contents/MacOS/keypin" preview "${1:-active}" "${2:-zh-Hans}" "${3:-light}" "${@:4}"
 fi

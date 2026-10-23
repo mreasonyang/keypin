@@ -98,15 +98,49 @@ extension View {
 /// The source picker is the main glass surface; setup keeps its existing quiet list.
 struct SourceListSurface: ViewModifier {
     let usesGlass: Bool
+    @Environment(\.previewLegacyAppearance) private var legacyAppearance
     @Environment(\.accessibilityReduceTransparency) private var systemReduced
     @Environment(\.previewReduceTransparency) private var previewReduced
     @Environment(\.colorSchemeContrast) private var contrast
 
     func body(content: Content) -> some View {
-        if usesGlass && !systemReduced && !previewReduced && contrast != .increased {
+        if #available(macOS 26.0, *), usesGlass && !legacyAppearance && !systemReduced && !previewReduced && contrast != .increased {
             content.glassEffect(.regular, in: RoundedRectangle(cornerRadius: 13, style: .continuous))
         } else {
             content.surface(radius: 13)
+        }
+    }
+}
+
+/// Keep the system's native button treatment on each supported macOS release.
+struct SetupButtonStyle: ViewModifier {
+    var prominent = false
+    @Environment(\.previewLegacyAppearance) private var legacyAppearance
+
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(macOS 26.0, *), !legacyAppearance {
+            if prominent { content.buttonStyle(.glassProminent) }
+            else { content.buttonStyle(.glass) }
+        } else {
+            if prominent { content.buttonStyle(.borderedProminent) }
+            else { content.buttonStyle(.bordered) }
+        }
+    }
+}
+
+extension Animation {
+    static func panelTransition(duration: TimeInterval) -> Animation {
+        if #available(macOS 14.0, *) { return .snappy(duration: duration) }
+        return .easeInOut(duration: duration)
+    }
+}
+
+extension Image {
+    @ViewBuilder func statusPulse(isActive: Bool) -> some View {
+        if #available(macOS 14.0, *) {
+            self.symbolEffect(.pulse, options: .repeating, isActive: isActive)
+        } else {
+            self
         }
     }
 }
@@ -217,13 +251,18 @@ struct RowButtonStyle: ButtonStyle {
 struct SettingIcon: View {
     let symbol: String
     let color: Color
+    private var highlight: Color {
+        if #available(macOS 15.0, *) { return color.mix(with: .white, by: 0.15) }
+        let native = NSColor(color)
+        return Color(nsColor: native.blended(withFraction: 0.15, of: .white) ?? native)
+    }
     var body: some View {
         Image(systemName: symbol)
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(.white)
             .frame(width: 22, height: 22)
             .background(RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(LinearGradient(colors: [color.mix(with: .white, by: 0.15), color], startPoint: .top, endPoint: .bottom)))
+                .fill(LinearGradient(colors: [highlight, color], startPoint: .top, endPoint: .bottom)))
             .accessibilityHidden(true)
     }
 }
@@ -568,7 +607,12 @@ struct WindowMaterial: NSViewRepresentable {
 
 /// Debug previews can force the reduced-transparency path without changing system settings.
 private struct PreviewReduceTransparency: EnvironmentKey { static let defaultValue = false }
+private struct PreviewLegacyAppearance: EnvironmentKey { static let defaultValue = false }
 extension EnvironmentValues {
+    var previewLegacyAppearance: Bool {
+        get { self[PreviewLegacyAppearance.self] }
+        set { self[PreviewLegacyAppearance.self] = newValue }
+    }
     var previewReduceTransparency: Bool {
         get { self[PreviewReduceTransparency.self] }
         set { self[PreviewReduceTransparency.self] = newValue }

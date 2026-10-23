@@ -70,9 +70,9 @@ struct Panel: View {
                 if screenHeight != height { screenHeight = height }
             }
         }
-        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: model.runtimeState)
-        .animation(reduceMotion ? nil : .snappy(duration: 0.22), value: model.warning)
-        .onChange(of: model.showsOnboarding) { _, showing in
+        .animation(reduceMotion ? nil : .panelTransition(duration: 0.22), value: model.runtimeState)
+        .animation(reduceMotion ? nil : .panelTransition(duration: 0.22), value: model.warning)
+        .onChange(of: model.showsOnboarding) { showing in
             if showing { setupQuery = "" }
         }
     }
@@ -157,8 +157,8 @@ struct Panel: View {
     private func statusLine(_ state: RuntimeState) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 5) {
             Image(systemName: state.symbol)
+                .statusPulse(isActive: state.isTransient && !reduceMotion)
                 .font(.system(size: 10, weight: .bold))
-                .symbolEffect(.pulse, options: .repeating, isActive: state.isTransient && !reduceMotion)
             Text(L10n.text(model.statusKey))
                 .font(.system(size: 11.5, weight: .medium))
                 .lineLimit(2)
