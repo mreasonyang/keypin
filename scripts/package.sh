@@ -10,7 +10,12 @@ if [[ "$mode" == release && -z "${SPARKLE_PUBLIC_KEY:-}" ]]; then
   exit 1
 fi
 build_args=(-c release --disable-keychain --disable-netrc)
-[[ -z "${KEYPIN_ARCH:-}" ]] || build_args+=(--arch "$KEYPIN_ARCH")
+architecture="${KEYPIN_ARCH:-$(uname -m)}"
+case "$architecture" in
+  universal) build_args+=(--arch arm64 --arch x86_64) ;;
+  arm64|x86_64) build_args+=(--arch "$architecture") ;;
+  *) echo 'Unsupported package architecture' >&2; exit 2 ;;
+esac
 swift build "${build_args[@]}"
 binary_dir="$(swift build "${build_args[@]}" --show-bin-path)"
 binary="$binary_dir/keypin"
@@ -75,7 +80,7 @@ swift "$root/packaging/make-icon.swift" "$staged_app/Contents/Resources/AppIcon.
 [[ -s "$staged_app/Contents/Resources/AppIcon.icns" ]]
 plutil -lint "$staged_app/Contents/Info.plist" >/dev/null
 bash "$root/scripts/sign-app.sh" "$staged_app"
-verify_args=("$staged_app")
+verify_args=("$staged_app" --architecture "$architecture")
 [[ "$mode" != release ]] || verify_args+=(--release)
 python3 "$root/scripts/verify-package.py" "${verify_args[@]}"
 

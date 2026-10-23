@@ -5,10 +5,12 @@ import argparse
 import base64
 import plistlib
 import subprocess
+from macho import architectures, THIN, FAT
 
 parser = argparse.ArgumentParser()
 parser.add_argument("app", type=Path)
 parser.add_argument("--release", action="store_true")
+parser.add_argument("--architecture", choices=("arm64", "x86_64", "universal"))
 args = parser.parse_args()
 app = args.app.resolve()
 binary = app / "Contents/MacOS/keypin"
@@ -30,6 +32,21 @@ assert helper_info["CFBundleExecutable"] == "keypin-focus"
 assert helper_info["LSUIElement"] is True
 assert not any(key.startswith("SU") for key in helper_info), "Focus helper must never configure an updater"
 assert helper_binary.is_file() and helper_binary.stat().st_mode & 0o111
+main_architectures = architectures(binary.read_bytes())
+expected = frozenset(("arm64", "x86_64")) if args.architecture == "universal" else (
+    frozenset((args.architecture,)) if args.architecture else main_architectures)
+assert main_architectures == expected, "Main executable architecture differs from the requested package"
+assert architectures(helper_binary.read_bytes()) == expected, "Focus helper architecture differs from the main app"
+assert expected <= architectures((framework / "Sparkle").read_bytes()), "Sparkle is missing a required architecture"
+seen = set()
+for candidate in app.rglob("*"):
+    if not candidate.is_file() or candidate.resolve() in seen:
+        continue
+    seen.add(candidate.resolve())
+    with candidate.open("rb") as stream:
+        magic = stream.read(4)
+    if magic in THIN or magic in FAT:
+        assert expected <= architectures(candidate.read_bytes()), f"Embedded code is missing a required architecture: {candidate.relative_to(app)}"
 assert helper_info["CFBundleVersion"] == info["CFBundleVersion"]
 assert info["SUVerifyUpdateBeforeExtraction"] is True
 assert info["SURequireSignedFeed"] is True

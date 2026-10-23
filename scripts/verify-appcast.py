@@ -5,6 +5,8 @@ import base64
 import plistlib
 import sys
 import xml.etree.ElementTree as ET
+import zipfile
+from macho import architectures, label
 
 feed, archive, tag, plist = sys.argv[1:]
 namespace = "{http://www.andymatuschak.org/xml-namespaces/sparkle}"
@@ -21,7 +23,13 @@ def normalized_version(value):
         parts.pop()
     return parts
 assert normalized_version(item.findtext(namespace + "minimumSystemVersion")) == normalized_version(info["LSMinimumSystemVersion"])
-assert item.findtext(namespace + "hardwareRequirements") == "arm64"
+with zipfile.ZipFile(archive) as package:
+    executable = next(name for name in package.namelist()
+                      if name.endswith("KeyPin.app/Contents/MacOS/keypin") and not name.startswith("__MACOSX/"))
+    archive_architectures = architectures(package.read(executable))
+hardware = item.findtext(namespace + "hardwareRequirements")
+assert hardware == ("arm64" if archive_architectures == frozenset(("arm64",)) else None), "Appcast hardware restriction differs from the actual executable"
+assert Path(archive).name == f"KeyPin-{info['CFBundleShortVersionString']}-{label(archive_architectures)}.zip", "Archive filename differs from its executable architectures"
 enclosure = item.find("enclosure")
 assert enclosure is not None
 assert enclosure.get("url") == f"https://github.com/mreasonyang/keypin/releases/download/{tag}/{Path(archive).name}"

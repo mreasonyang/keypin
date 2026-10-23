@@ -17,11 +17,15 @@ jobs:
   test-and-package:
     runs-on: macos-26
     timeout-minutes: 30
+    env:
+      KEYPIN_ARCH: universal
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
-      - name: Test and build development package
+      - name: Enable Intel execution for architecture tests
+        run: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+      - name: Test both architectures and build Universal development package
         env:
           KEYPIN_CI_ARCHIVE: '1'
         run: bash scripts/ci.sh

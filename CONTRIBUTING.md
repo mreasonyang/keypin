@@ -7,10 +7,10 @@
 需要带 macOS 26 SDK 的 Xcode / Swift。以下命令均在项目根目录运行。
 
 ```sh
-./scripts/ci.sh
+KEYPIN_ARCH=universal ./scripts/ci.sh
 ```
 
-`ci.sh` 与 GitHub CI 使用相同的测试、本地化、发布脚本检查和开发包构建流程。SwiftPM 依赖通过 `Package.resolved` 固定；公开依赖下载禁用 Keychain/netrc 凭据读取。
+`ci.sh` 与 GitHub CI 使用相同的测试、本地化、发布脚本检查和开发包构建流程。Universal 模式先执行本机架构测试，再用 x86_64 XCTest 驱动执行 Intel 测试，最后校验主程序、焦点辅助程序及嵌入代码均包含两个架构。Apple silicon 本机需要先安装 Rosetta；Actions 会显式安装。省略 `KEYPIN_ARCH` 时只构建本机架构，也可设置为 `arm64` 或 `x86_64`。SwiftPM 依赖通过 `Package.resolved` 固定；公开依赖下载禁用 Keychain/netrc 凭据读取。
 
 当前应用输出到 `build/KeyPin.app`。打包先构建、嵌入 Sparkle、签名并校验，再替换当前应用；成功后清除暂存包。打包失败会恢复当前应用，不修改用户命令或登录项。请勿并发运行打包脚本。本地默认签名为 ad-hoc，未做 Developer ID 签名或公证；正式 GitHub Actions 发布流程见[发布指南](docs/releasing.md)。
 

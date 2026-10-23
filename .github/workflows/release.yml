@@ -28,6 +28,7 @@ jobs:
       commit: ${{ steps.source.outputs.commit }}
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      KEYPIN_ARCH: universal
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
@@ -49,7 +50,9 @@ jobs:
           printf 'tag=%s\n' "$RELEASE_TAG" >> "$GITHUB_OUTPUT"
           printf 'commit=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Run all checks before signing
-        run: bash scripts/ci.sh
+        run: |
+          /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+          bash scripts/ci.sh
       - name: Sign, notarize, staple, assess and sign update feed
         env:
           MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
@@ -68,7 +71,7 @@ jobs:
         with:
           name: KeyPin-release-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            build/release/KeyPin-*-arm64.zip
+            build/release/KeyPin-*-universal.zip
             build/release/appcast.xml
             build/release/SHA256SUMS
             build/release/verification.json
@@ -124,7 +127,7 @@ jobs:
           assert old and len(new) == 1 and new[0] > max(old), 'CFBundleVersion must increase beyond the previous stable release'
           PY
           fi
-          gh release create "$RELEASE_TAG" "KeyPin-${RELEASE_TAG#v}-arm64.zip" appcast.xml SHA256SUMS verification.json \
+          gh release create "$RELEASE_TAG" "KeyPin-${RELEASE_TAG#v}-universal.zip" appcast.xml SHA256SUMS verification.json \
             --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "KeyPin ${RELEASE_TAG#v}" --generate-notes
           # A failed upload/verification stays draft. Re-running never overwrites it:
           # inspect and delete that failed draft before retrying the exact tag.

@@ -6,7 +6,7 @@
 
 KeyPin 是一款轻量的 macOS 菜单栏工具。在不同应用（如终端、编辑器、浏览器与聊天软件）之间切换时，KeyPin 能自动检测输入源变化并尝试切回你预设的目标，减少频繁手动切换输入法的打扰。
 
-> **系统要求**：macOS 26 或更高版本。原生 Liquid Glass 界面支持简体中文、繁體中文、English、日本語和 한국어。
+> **系统要求**：macOS 26 或更高版本，Apple silicon 或 Intel Mac。Universal 安装包同时包含两种架构。原生 Liquid Glass 界面支持简体中文、繁體中文、English、日本語和 한국어。
 
 [官网](https://keypin.kyun.si) · [版本与下载](https://github.com/mreasonyang/keypin/releases) · [问题反馈](https://github.com/mreasonyang/keypin/issues)
 
@@ -36,7 +36,7 @@ KeyPin 是一款轻量的 macOS 菜单栏工具。在不同应用（如终端、
 
 ### 使用预编译应用包
 
-从 [GitHub Releases](https://github.com/mreasonyang/keypin/releases) 下载已发布的 Apple silicon ZIP 并解压，获得 `KeyPin.app` 后：
+从 [GitHub Releases](https://github.com/mreasonyang/keypin/releases) 下载已发布的 Universal ZIP 并解压，同一个安装包适用于 Apple silicon 和 Intel Mac。获得 `KeyPin.app` 后：
 
 1. 将应用移至准备长期放置的目录（建议置于「应用程序」`/Applications`）。若需开启「登录时启动」，请务必在移动位置后再开启。
 2. 双击打开即可开始使用。

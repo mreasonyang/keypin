@@ -13,7 +13,7 @@ import tempfile
 
 
 APP_NAME = "KeyPin.app"
-PHASES = ("success", "first-install", "icon", "sign", "sign-downloader", "sign-helper", "verify", "missing-framework", "framework-copy", "rpath", "helper-embed", "helper-rpath", "retire", "publish", "published-error")
+PHASES = ("success", "first-install", "universal", "missing-intel", "icon", "sign", "sign-downloader", "sign-helper", "verify", "missing-framework", "framework-copy", "rpath", "helper-embed", "helper-rpath", "retire", "publish", "published-error")
 
 
 def run_fixture(source: Path, base: Path, phase: str) -> None:
@@ -23,9 +23,17 @@ def run_fixture(source: Path, base: Path, phase: str) -> None:
     tools.mkdir()
     shutil.copytree(source / "packaging", fixture / "packaging")
     shutil.copyfile(source / "LICENSE", fixture / "LICENSE")
+    # Transaction fixtures contain text, not native binaries. Real slice parsing
+    # and appcast eligibility are covered separately by test-distribution.py.
+    (fixture / "scripts/macho.py").write_text('''import os
+THIN, FAT = {}, {}
+def architectures(data):
+    return frozenset(("arm64", "x86_64")) if os.environ.get("KEYPIN_ARCH") == "universal" and os.environ["FAIL_PHASE"] != "missing-intel" else frozenset(("arm64",))
+''')
     (tools / "swift").write_text('''#!/bin/bash
 set -euo pipefail
 if [[ "$1" == "build" ]]; then
+  echo "$*" > "$FIXTURE_ROOT/swift-build-arguments"
   if [[ " $* " == *" --show-bin-path "* ]]; then
     echo "$PWD/.build/custom-release"
   else
@@ -112,6 +120,7 @@ exec /bin/mv "$@"
         FIXTURE_ROOT=str(fixture),
         PACKAGE_APP_NAME=APP_NAME,
         KEYPIN_PACKAGE_MODE="development",
+        KEYPIN_ARCH="universal" if phase in ("universal", "missing-intel") else "arm64",
         SPARKLE_PUBLIC_KEY="",
     )
     result = subprocess.run(
@@ -120,7 +129,7 @@ exec /bin/mv "$@"
     )
     assert not command.is_symlink(), phase
     assert hashlib.sha256(command.read_bytes()).hexdigest() == before, phase
-    if phase in ("success", "first-install"):
+    if phase in ("success", "first-install", "universal"):
         assert result.returncode == 0, result.stderr
         assert (app / "Contents/MacOS/keypin").read_text() == "new-binary\n"
         assert (app / "Contents/Resources/LICENSE").read_bytes() == (source / "LICENSE").read_bytes()
@@ -132,6 +141,8 @@ exec /bin/mv "$@"
         assert "--preserve-metadata=entitlements" in signs[1]
         assert all("--deep" not in line for line in signs)
         assert not (app / "current-marker").exists()
+        if phase == "universal":
+            assert "--arch arm64 --arch x86_64" in (fixture / "swift-build-arguments").read_text()
     else:
         assert result.returncode != 0, phase
         assert (app / "current-marker").read_bytes() == b"current app bytes", phase

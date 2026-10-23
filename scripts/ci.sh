@@ -5,10 +5,14 @@ cd "$root"
 for script in scripts/*.sh; do bash -n "$script"; done
 python3 scripts/test-release.py
 python3 scripts/test-packaging.py
+python3 scripts/test-distribution.py
 python3 scripts/check-localizations.py
 swift test --disable-keychain --disable-netrc
+if [[ "${KEYPIN_ARCH:-}" == universal ]]; then
+  python3 scripts/test-intel.py
+fi
 KEYPIN_PACKAGE_MODE=development bash scripts/package.sh
-python3 scripts/verify-package.py "$root/build/KeyPin.app"
+python3 scripts/verify-package.py "$root/build/KeyPin.app" --architecture "${KEYPIN_ARCH:-$(uname -m)}"
 bash scripts/test-sparkle.sh "$root/build/KeyPin.app"
 "$root/build/KeyPin.app/Contents/MacOS/keypin" --help >/dev/null
 # A non-focus invocation proves the nested copy can load its framework and
@@ -22,7 +26,7 @@ else
 fi
 if [[ "${KEYPIN_CI_ARCHIVE:-0}" == 1 ]]; then
   mkdir -p "$root/build/development"
-  archive="$root/build/development/KeyPin-development-$(uname -m).zip"
+  archive="$root/build/development/KeyPin-development-${KEYPIN_ARCH:-$(uname -m)}.zip"
   ditto -c -k --sequesterRsrc --keepParent "$root/build/KeyPin.app" "$archive"
   (cd "$root/build/development" && shasum -a 256 "$(basename "$archive")" > SHA256SUMS)
 fi

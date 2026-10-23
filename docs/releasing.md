@@ -1,10 +1,10 @@
 # GitHub 发布与自动更新
 
-仓库：[mreasonyang/keypin](https://github.com/mreasonyang/keypin)。发行范围是 macOS 26+、Apple silicon。代码、版本标签、Actions 和 Release 均在这个仓库管理。
+仓库：[mreasonyang/keypin](https://github.com/mreasonyang/keypin)。发行范围是 macOS 26+、Apple silicon 与 Intel，使用同一个 Universal ZIP。代码、版本标签、Actions 和 Release 均在这个仓库管理。
 
 ## 更新机制
 
-应用使用固定版本的 [Sparkle 2](https://sparkle-project.org/documentation/) 标准更新器，完成检查、下载、签名验证、替换应用和重启。GitHub Releases 托管 ZIP 与 `appcast.xml`；应用固定读取：
+应用使用固定版本的 [Sparkle 2](https://sparkle-project.org/documentation/) 标准更新器，完成检查、下载、签名验证、替换应用和重启。Universal 更新同时包含 arm64 与 x86_64；appcast 不附加仅限 arm64 的硬件限制，旧 arm64 版本可使用原公钥升级。发布校验读取 ZIP 中的真实 Mach-O 架构，拒绝架构与硬件限制不一致的 feed。GitHub Releases 托管 ZIP 与 `appcast.xml`；应用固定读取：
 
 ```text
 https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml
@@ -19,7 +19,7 @@ https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml
 - **CI**：`main` 推送及 PR 运行测试、本地化、发布工具检查和开发包构建；产物标注 development，无 Apple 公证，未配置公钥时禁用更新。它不读取发布私钥。
 - **Release**：版本标签 `v*` 或手动选择已有版本标签，核对标签与 `Info.plist`，测试后构建、签名、公证、附加票据、验证 Gatekeeper、制作 ZIP、签署 appcast，最后保存为 Draft Release。完成最终包安装验收后，公开同一草稿。凭据缺失或任一检查失败就停止，不能退回未签名正式发布。
 
-Actions 使用 `macos-26`。本地可通过 `./scripts/ci.sh` 运行同一开发验证流程；正式发布由 GitHub 执行，不依赖维护者本机的钥匙串。
+Actions 使用 `macos-26`，显式安装 Rosetta 并执行原生与 Intel 两组测试。本地可通过 `KEYPIN_ARCH=universal ./scripts/ci.sh` 运行同一开发验证流程；正式发布由 GitHub 执行，不依赖维护者本机的钥匙串。Rosetta 运行结果与 Intel 真机验收分别记录。
 
 ## 维护者一次性配置
 
@@ -92,7 +92,7 @@ gh variable list --repo mreasonyang/keypin
 
 1. 在 `packaging/Info.plist` 更新 `CFBundleShortVersionString`，并递增 `CFBundleVersion`。提交到 `main`，等待 CI 通过。
 2. 对这个确定的提交创建匹配标签，如 `v0.0.15`，推送标签触发 Release。不要复用已发布标签或用相同构建号替换安装包。
-3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Draft Release 应包含 `KeyPin-<version>-arm64.zip`、`SHA256SUMS`、`appcast.xml` 和仅含公开验证结果的 `verification.json`。工作流建立草稿后重新下载已上传文件核对哈希，验收前保留草稿状态；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
+3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Draft Release 应包含 `KeyPin-<version>-universal.zip`、`SHA256SUMS`、`appcast.xml` 和仅含公开验证结果的 `verification.json`。工作流建立草稿后重新下载已上传文件核对哈希，验收前保留草稿状态；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
 4. 使用 `gh release download v<version> --repo mreasonyang/keypin --dir <empty-directory>` 下载草稿，验证校验和、隔离属性下首次启动、登录自启、真实中文候选和跨 App 焦点。存在上一支持更新版本时，还要验证实际升级与配置保留。开发包、单测或签名结果不替代这一步。首个版本尚无公开更新源，检查更新返回无可用 feed 不能算作双版本升级验收。
 5. 安装验收通过后，用 `gh release edit v<version> --repo mreasonyang/keypin --draft=false --latest` 公开已验证的同一草稿。重新从公开 URL 下载核对 SHA-256，再更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
 
