@@ -1,0 +1,194 @@
+{
+  "recorded_at": "2026-10-23T05:11:07.604337+00:00",
+  "environment": {
+    "macOS": "27.0.1",
+    "architecture": "arm64"
+  },
+  "official_old_version": {
+    "source_url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.16/KeyPin-0.0.16-arm64.zip",
+    "archive_sha256": "fdfe363910a90cedf8a0c1bafbb255f5db0c528b42d785ee0a3573bc45cfec3a",
+    "installed_application_matches_all_published_files_and_symlinks": true,
+    "fixture_used": false,
+    "local_version_metadata_changed": false
+  },
+  "remote_before": {
+    "checked_at": "2026-10-23T05:02:27.823769+00:00",
+    "url": "https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml",
+    "version": "0.0.16",
+    "build": 17,
+    "sha256": "6bf2e9d3484bc0ff866b02ffd2cfcba1cef1887e96b97dc9cfe4c6a3c869c39e",
+    "anonymous": true
+  },
+  "new_actions_artifact": {
+    "tag": "v0.0.17",
+    "version": "0.0.17",
+    "build": 18,
+    "zip_sha256": "96aee3ae3730d78d2f097e1fac295eab23eb6542cda6366b7c9210ededbd89f0",
+    "zip_bytes": 2409968,
+    "same_update_key_and_production_feed": true,
+    "no_fixture_marker": true,
+    "source_commit": "8851c5c40dbc7f48d0fa708554e661abf3732d73",
+    "notarization": {
+      "id": "3be2a045-06f8-47ee-8ed8-06d96d9b7bf6",
+      "status": "Accepted"
+    },
+    "workflow": "https://github.com/mreasonyang/keypin/actions/runs/39903337069"
+  },
+  "remote_publication": {
+    "verified_at": "2026-10-23T05:05:19.773760+00:00",
+    "published_at": "2026-10-23T05:04:53Z",
+    "release_url": "https://github.com/mreasonyang/keypin/releases/tag/v0.0.17",
+    "zip_sha256": "96aee3ae3730d78d2f097e1fac295eab23eb6542cda6366b7c9210ededbd89f0",
+    "zip_bytes": 2409968,
+    "assets": [
+      {
+        "name": "KeyPin-0.0.17-arm64.zip",
+        "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.17/KeyPin-0.0.17-arm64.zip",
+        "bytes": 2409968,
+        "sha256": "96aee3ae3730d78d2f097e1fac295eab23eb6542cda6366b7c9210ededbd89f0",
+        "matches_signed_artifact": true
+      },
+      {
+        "name": "appcast.xml",
+        "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.17/appcast.xml",
+        "bytes": 1335,
+        "sha256": "089b7a5bb6cb13e552b69791aaec6b2a23916492459404ae88ec4bca6186e2e3",
+        "matches_signed_artifact": true
+      },
+      {
+        "name": "SHA256SUMS",
+        "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.17/SHA256SUMS",
+        "bytes": 252,
+        "sha256": "b9acbb7cf514b78677685f99068e70981f9d7749aebebb576422df329b96a34c",
+        "matches_signed_artifact": true
+      },
+      {
+        "name": "verification.json",
+        "url": "https://github.com/mreasonyang/keypin/releases/download/v0.0.17/verification.json",
+        "bytes": 637,
+        "sha256": "591ece39bd4f5c16b042edc3b8ca2b5c7d9bd222b077bda035b10b39e46a9b42",
+        "matches_signed_artifact": true
+      }
+    ],
+    "feed_url": "https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml",
+    "feed_version": "0.0.17",
+    "feed_build": 18,
+    "feed_sha256": "089b7a5bb6cb13e552b69791aaec6b2a23916492459404ae88ec4bca6186e2e3",
+    "anonymous": true
+  },
+  "scheduler_start": {
+    "started_at": "2026-10-23T05:05:57.290932+00:00",
+    "local_version": "0.0.16",
+    "local_build": 17,
+    "remote_release": "v0.0.17",
+    "remote_published_at": "2026-10-23T05:04:53Z",
+    "last_check_time_cleared": true,
+    "feed_override": false,
+    "local_bundle_modified": false,
+    "fixture_used": false,
+    "manual_check_invoked": false
+  },
+  "automatic_background_download": {
+    "phase": "quit",
+    "checked_at": "2026-10-23T05:06:03.964287+00:00",
+    "remote_release": "v0.0.17",
+    "remote_published_at": "2026-10-23T05:04:53Z",
+    "installed_version": "0.0.16",
+    "installed_build": "17",
+    "fixture_used": false,
+    "manual_check_invoked": false,
+    "automatic_preferences": {
+      "SUEnableAutomaticChecks": "1",
+      "SUAutomaticallyUpdate": "1"
+    },
+    "scheduled_check_recorded": true,
+    "downloaded_archives": [
+      {
+        "sha256": "96aee3ae3730d78d2f097e1fac295eab23eb6542cda6366b7c9210ededbd89f0",
+        "bytes": 2409968,
+        "created_after_start": true,
+        "created_after_remote_publication": true
+      }
+    ],
+    "signed_new_version_extracted_in_sparkle_cache": true,
+    "passed": true
+  },
+  "automatic_installation": {
+    "phase": "quit",
+    "initial": {
+      "version": "0.0.16",
+      "build": "17",
+      "pids": [
+        41153
+      ]
+    },
+    "observations": [
+      {
+        "at": "2026-10-23T05:07:15.511616+00:00",
+        "version": "0.0.16",
+        "build": "17",
+        "pids": [
+          41153
+        ]
+      },
+      {
+        "at": "2026-10-23T05:07:19.759742+00:00",
+        "version": "0.0.17",
+        "build": "18",
+        "pids": []
+      }
+    ],
+    "installed": true,
+    "observer_started_application": false,
+    "no_fixture_marker": true,
+    "all_bundle_files_and_symlinks_match_public_0_0_17": true,
+    "signature_valid": true,
+    "gatekeeper_accepted": true,
+    "staple_valid": true,
+    "configuration_preserved": true,
+    "login_plist_preserved": true,
+    "cli_link_preserved": true,
+    "passed": true
+  },
+  "final_state": {
+    "checked_at": "2026-10-23T05:08:58.402689+00:00",
+    "version": "0.0.17",
+    "build": 18,
+    "fixture_used": false,
+    "configuration_preserved": true,
+    "login_plist_preserved": true,
+    "cli_link_preserved": true,
+    "restart_from_original_login_job_passed": true,
+    "running": true,
+    "state": "keeping",
+    "main_process_count": 1,
+    "final_check": "up_to_date",
+    "passed": true,
+    "automatic_checks_enabled": false,
+    "automatic_downloads_enabled": false,
+    "automatic_update_preferences_restored": true
+  },
+  "website": {
+    "source_commit": "d60953785c6808e8ad24fbd001c8de37fd19714b",
+    "cloudflare_deployment_id": "f48191c0-e56b-4103-ab81-5caef83ff021",
+    "github_validation": "https://github.com/mreasonyang/keypin-site/actions/runs/39903983735",
+    "origins": [
+      {
+        "url": "https://keypin.kyun.si",
+        "public_files_checked": 19,
+        "passed": true,
+        "checked_at": "2026-10-23T05:09:08.640587+00:00"
+      },
+      {
+        "url": "https://keypin-site.pages.dev",
+        "public_files_checked": 19,
+        "passed": true,
+        "checked_at": "2026-10-23T05:09:03.849903+00:00"
+      }
+    ]
+  },
+  "fixture_used": false,
+  "local_old_version_metadata_changed": false,
+  "custom_update_feed_used": false,
+  "passed": true
+}
