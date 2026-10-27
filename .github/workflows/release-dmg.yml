@@ -1,0 +1,92 @@
+name: Add notarized DMG to an existing release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published stable tag to wrap without rebuilding
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keypin-production-release
+  cancel-in-progress: false
+
+jobs:
+  dmg:
+    if: github.repository == 'mreasonyang/keypin' && github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Download and verify the exact published ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, re
+          assert re.fullmatch(r'v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', os.environ['RELEASE_TAG'])
+          PY
+          mkdir -p build/source build/release
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > build/source/release.json
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern "KeyPin-${RELEASE_TAG#v}-universal.zip" --dir build/source
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          release = json.loads(Path('build/source/release.json').read_text())
+          assert not release['draft'] and not release['prerelease']
+          name = f"KeyPin-{os.environ['RELEASE_TAG'][1:]}-universal.zip"
+          assert not any(a['name'].endswith('.dmg') for a in release['assets']), 'DMG already exists; never overwrite release assets'
+          asset, = [a for a in release['assets'] if a['name'] == name]
+          data = (Path('build/source') / name).read_bytes()
+          assert asset['digest'] == 'sha256:' + hashlib.sha256(data).hexdigest()
+          assert len(data) == asset['size']
+          print('PASS: published ZIP digest and size match GitHub metadata')
+          PY
+      - name: Package, sign, notarize and verify DMG
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          AC_APPLE_ID: ${{ secrets.AC_APPLE_ID }}
+          AC_TEAM_ID: ${{ secrets.AC_TEAM_ID }}
+          AC_PASSWORD: ${{ secrets.AC_PASSWORD }}
+        run: bash scripts/release-dmg.sh "$RELEASE_TAG" "$PWD/build/source/KeyPin-${RELEASE_TAG#v}-universal.zip" "$PWD/build/release/KeyPin-${RELEASE_TAG#v}-universal.dmg"
+      - name: Always remove signing credentials
+        if: always()
+        run: bash scripts/cleanup-release.sh
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: KeyPin-DMG-${{ github.run_id }}
+          path: build/release/*
+          if-no-files-found: error
+
+  publish:
+    needs: dmg
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: KeyPin-DMG-${{ github.run_id }}
+          path: release
+      - name: Add verified installer and checksum without replacing existing assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          cd release
+          sha256sum --check "KeyPin-${RELEASE_TAG#v}-universal.dmg.sha256"
+          gh release upload "$RELEASE_TAG" ./* --repo "$GITHUB_REPOSITORY"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.dmg*' --dir downloaded
+          (cd downloaded && sha256sum --check "KeyPin-${RELEASE_TAG#v}-universal.dmg.sha256")

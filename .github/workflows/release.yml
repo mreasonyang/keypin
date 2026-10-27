@@ -72,6 +72,7 @@ jobs:
           name: KeyPin-release-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             build/release/KeyPin-*-universal.zip
+            build/release/KeyPin-*-universal.dmg
             build/release/appcast.xml
             build/release/SHA256SUMS
             build/release/verification.json
@@ -127,7 +128,7 @@ jobs:
           assert old and len(new) == 1 and new[0] > max(old), 'CFBundleVersion must increase beyond the previous stable release'
           PY
           fi
-          gh release create "$RELEASE_TAG" "KeyPin-${RELEASE_TAG#v}-universal.zip" appcast.xml SHA256SUMS verification.json \
+          gh release create "$RELEASE_TAG" "KeyPin-${RELEASE_TAG#v}-universal.zip" "KeyPin-${RELEASE_TAG#v}-universal.dmg" appcast.xml SHA256SUMS verification.json \
             --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "KeyPin ${RELEASE_TAG#v}" --generate-notes
           # A failed upload/verification stays draft. Re-running never overwrites it:
           # inspect and delete that failed draft before retrying the exact tag.

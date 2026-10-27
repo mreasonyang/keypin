@@ -1,6 +1,6 @@
 # GitHub 发布与自动更新
 
-仓库：[mreasonyang/keypin](https://github.com/mreasonyang/keypin)。发行范围是 macOS 13+、Apple silicon 与 Intel，使用同一个 Universal ZIP。代码、版本标签、Actions 和 Release 均在这个仓库管理。
+仓库：[mreasonyang/keypin](https://github.com/mreasonyang/keypin)。发行范围是 macOS 13+、Apple silicon 与 Intel，官网通过 GitHub Releases 直接下载 Universal DMG，自动更新继续使用 Universal ZIP。代码、版本标签、Actions 和 Release 均在这个仓库管理。
 
 ## 更新机制
 
@@ -17,7 +17,7 @@ https://github.com/mreasonyang/keypin/releases/latest/download/appcast.xml
 ## 两条 Actions 流程
 
 - **CI**：`main` 推送及 PR 运行测试、本地化、发布工具检查和开发包构建；产物标注 development，无 Apple 公证，未配置公钥时禁用更新。它不读取发布私钥。
-- **Release**：版本标签 `v*` 或手动选择已有版本标签，核对标签与 `Info.plist`，测试后构建、签名、公证、附加票据、验证 Gatekeeper、制作 ZIP、签署 appcast，最后保存为 Draft Release。完成最终包安装验收后，公开同一草稿。凭据缺失或任一检查失败就停止，不能退回未签名正式发布。
+- **Release**：版本标签 `v*` 或手动选择已有版本标签，核对标签与 `Info.plist`，测试后构建、签名、公证、附加票据、验证 Gatekeeper、制作 ZIP、签署 appcast，并制作、签名和单独公证带 Applications 快捷方式的 DMG，最后保存为 Draft Release。完成最终包安装验收后，公开同一草稿。凭据缺失或任一检查失败就停止，不能退回未签名正式发布。
 
 Actions 使用 `macos-26`，显式安装 Rosetta 并执行原生与 Intel 两组测试。CI 还在 macOS 15 的 Apple silicon 和 Intel runner 上运行同一构建产物，检查旧系统的窗口与按钮回退。macOS 13/14 的实机交互验收仍需单独记录。
 
@@ -94,7 +94,7 @@ gh variable list --repo mreasonyang/keypin
 
 1. 在 `packaging/Info.plist` 更新 `CFBundleShortVersionString`，并递增 `CFBundleVersion`。提交到 `main`，等待 CI 通过。
 2. 对这个确定的提交创建匹配标签，如 `v0.0.15`，推送标签触发 Release。不要复用已发布标签或用相同构建号替换安装包。
-3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Draft Release 应包含 `KeyPin-<version>-universal.zip`、`SHA256SUMS`、`appcast.xml` 和仅含公开验证结果的 `verification.json`。工作流建立草稿后重新下载已上传文件核对哈希，验收前保留草稿状态；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
+3. 检查 Actions 的签名、公证、staple、Gatekeeper 和 appcast 验证结果。Draft Release 应包含 `KeyPin-<version>-universal.dmg`、`KeyPin-<version>-universal.zip`、`SHA256SUMS`、`appcast.xml` 和仅含公开验证结果的 `verification.json`。工作流建立草稿后重新下载已上传文件核对哈希，验收前保留草稿状态；版本号和构建号都必须高于上一正式版。如果上传或核验失败，草稿会保留，重跑不会覆盖它；检查并删除该失败草稿后，再对同一标签重试。
 4. 使用 `gh release download v<version> --repo mreasonyang/keypin --dir <empty-directory>` 下载草稿，验证校验和、隔离属性下首次启动、登录自启、真实中文候选和跨 App 焦点。存在上一支持更新版本时，还要验证实际升级与配置保留。开发包、单测或签名结果不替代这一步。首个版本尚无公开更新源，检查更新返回无可用 feed 不能算作双版本升级验收。
 5. 安装验收通过后，用 `gh release edit v<version> --repo mreasonyang/keypin --draft=false --latest` 公开已验证的同一草稿。重新从公开 URL 下载核对 SHA-256，再更新官网的下载和版本信息。官网展示与实际 ZIP 的版本、架构和校验和必须一致。
 
@@ -103,3 +103,10 @@ Universal 新版已完成 [0.0.17 → 0.0.18 的正式远程升级及双架构�
 正式版本间自动更新也已完成[0.0.16 → 远程正式 0.0.17 的实机验证](REMOTE-AUTO-UPDATE-0.0.16-TO-0.0.17-20261023.md)：本机保留真实正式旧版，远程由 Actions 构建、签名、公证并公开新版，再通过同一生产 feed 自动发现、下载和退出安装；配置、登录项和 CLI 均保留。
 
 发布升级验收应使用真实公开的旧、新版本。修改本地版本元数据生成的测试基线仅可作为补充安装检查，不能代替正式远程升级验收。后续产品数据迁移及其他系统环境仍需对应验证；核心输入法、中文候选和跨 App 焦点验收按产品自身要求执行。
+
+
+## 为已发布版本补充 DMG
+
+在 `main` 手动运行 **Add notarized DMG to an existing release**，输入已有稳定标签（例如 `v0.0.19`）。流程下载 GitHub 已发布的 Universal ZIP，核对 GitHub 资产摘要与大小，验证应用签名、公证票据及架构，不重新构建应用。DMG 内含原样的 `KeyPin.app` 和 `/Applications` 快捷方式；挂载比对应用内容后，再用临时钥匙串签名、公证、附加票据并验证 DMG 的 Gatekeeper 结果。
+
+发布任务只新增 DMG 和同名 `.dmg.sha256`，不覆盖原 ZIP、appcast 或校验文件，也不修改标签。已存在 DMG 时拒绝重跑覆盖。新版本的常规 Release 流程同时产出 DMG 和 Sparkle ZIP；官网三个语言的下载按钮均应使用 `https://github.com/mreasonyang/keypin/releases/download/v<version>/KeyPin-<version>-universal.dmg`，安装说明为打开 DMG 并拖入 Applications。
