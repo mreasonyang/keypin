@@ -13,8 +13,10 @@ ditto -x -k "$archive" "$signing_dir/extracted"
 app="$signing_dir/extracted/KeyPin.app"
 python3 - "$tag" "$app/Contents/Info.plist" <<'PY'
 import plistlib, sys
-from importlib.machinery import SourceFileLoader
-preflight = SourceFileLoader('preflight', 'scripts/release-preflight.py').load_module()
+import importlib.util
+spec = importlib.util.spec_from_file_location('preflight', 'scripts/release-preflight.py')
+preflight = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(preflight)
 with open(sys.argv[2], 'rb') as stream: preflight.validate_tag(sys.argv[1], plistlib.load(stream))
 PY
 bash scripts/package-dmg.sh "$app" "$output"
