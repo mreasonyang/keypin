@@ -1,0 +1,87 @@
+{
+  "version": "0.0.20",
+  "build": 21,
+  "sourceCommit": "c2d3a185ea40e460974e9ed2f395818725f4feac",
+  "ciRun": 40560640994,
+  "releaseRun": 40562196676,
+  "assets": {
+    "KeyPin-0.0.20-universal.zip": {
+      "bytes": 3408556,
+      "sha256": "03cd4d9ab3a7005181bc4b652393f3560c593731e4a68a8b26110f408bebb0be"
+    },
+    "KeyPin-0.0.20-universal.dmg": {
+      "bytes": 4240822,
+      "sha256": "a3c4391a9a7634fa84752886fc7391950ded8eb8b66657082245a81c412cd0fc"
+    },
+    "appcast.xml": {
+      "bytes": 1260,
+      "sha256": "e86cf5481ca5dafe8842f7ada68f3f0d4d2276f71564b89304544f662b1a77a7"
+    },
+    "verification.json": {
+      "bytes": 827,
+      "sha256": "0637195cb39cb22dc91af72077b15300e7b377f7f810b185e2f12bcdb89da514"
+    }
+  },
+  "localUnitTests": 159,
+  "candidateChecks": {
+    "uploadedAssetHashes": true,
+    "appDeveloperID": true,
+    "appNotarizationTicket": true,
+    "appGatekeeper": true,
+    "dmgSignature": true,
+    "dmgNotarizationTicket": true,
+    "dmgGatekeeper": true,
+    "arm64CLI": true,
+    "rosettaCLI": true,
+    "focusHelperRejectsCLI": true,
+    "sparkleTrustContinuity": true,
+    "mountedInstallerAppMatchesZIP": true
+  },
+  "installationAcceptance": "passed",
+  "productionUpgrade": "passed",
+  "physicalIntelInteractiveAcceptance": false,
+  "macOS13Or14InteractiveAcceptance": false,
+  "nativeAboutVersion": "0.0.20 (21)",
+  "draftInstallationPreservation": {
+    "keyboardSettings": true,
+    "loginItem": true,
+    "cliLink": true
+  },
+  "automaticUpdatePreferencesObserved": {
+    "checks": false,
+    "downloads": false
+  },
+  "publicAssetReadback": {
+    "KeyPin-0.0.20-universal.zip": true,
+    "KeyPin-0.0.20-universal.dmg": true,
+    "appcast.xml": true,
+    "verification.json": true,
+    "SHA256SUMS": true,
+    "KeyPin-0.0.20-universal.dmg.sha256": true
+  },
+  "productionFeedBuild": 21,
+  "upgrade": {
+    "fromVersion": "0.0.19",
+    "fromBuild": 20,
+    "toVersion": "0.0.20",
+    "toBuild": 21,
+    "baselineMatchedPublishedBinary": true,
+    "installedBinaryMatchesPublishedZIP": true,
+    "mechanism": "Sparkle manual check, download, install and relaunch",
+    "unattendedAutomaticUpdateTested": false
+  },
+  "finalPreservation": {
+    "keyboardSettings": true,
+    "loginItem": true,
+    "cliLink": true
+  },
+  "installedSignatureAndTicketVerified": true,
+  "relaunchedNativeAboutVersion": "0.0.20 (21)",
+  "singleInstalledProcess": true,
+  "processChangedAfterUpgrade": true,
+  "host": {
+    "macOS": "27.0.1",
+    "architecture": "arm64"
+  },
+  "automaticUpdatePreferencesPreserved": true
+}
