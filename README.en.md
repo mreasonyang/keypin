@@ -29,6 +29,7 @@ KeyPin is a lightweight macOS menu bar utility that helps keep your preferred in
 
 - **Menu Bar Icon**: The menu bar displays the artwork of the input source macOS is currently using (falling back to KeyPin's keyboard glyph if the source lacks an icon). When set to “Follow system”, the icon appears dimmed.
 - **Target vs. Current**: When keeping is enabled, the checkmark (✓) marks the target input source; when paused, it moves to “Follow system”. The “Current” badge always indicates the input source macOS is actively using in real time.
+- **Conflict backoff**: Repeated switching within one app temporarily pauses automatic keeping and shows a retry prompt, limiting input-source and focus contention. Persistent conflicts extend the pause; switching apps or explicitly retrying resumes keeping.
 
 For detailed panel mechanics, onboarding flows, and state definitions, see the [Interface and Behavior Reference](docs/behavior.md) (in Chinese).
 
