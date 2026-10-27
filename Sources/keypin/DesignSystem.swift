@@ -24,7 +24,7 @@ extension RuntimeState {
         case .keeping: return .green
         case .switching, .waiting: return .blue
         case .secureInput: return .indigo
-        case .missingSource, .error: return .orange
+        case .missingSource, .error, .conflictPaused: return .orange
         case .setup: return .accentColor
         case .paused, .stopped: return .gray
         }

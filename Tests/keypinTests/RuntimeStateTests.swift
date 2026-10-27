@@ -2,6 +2,18 @@ import XCTest
 @testable import keypin
 
 final class RuntimeStateTests: XCTestCase {
+    func testConflictPauseNeverClaimsKeepingAndHonorsSafetyPriorities() {
+        let enabled = Config(sourceID: "ime", enabled: true)
+        XCTAssertEqual(RuntimeState.resolve(config: enabled, currentID: "ime", targetAvailable: true,
+                                           secureInput: false, conflictPaused: true), .conflictPaused)
+        XCTAssertEqual(RuntimeState.resolve(config: enabled, currentID: "abc", targetAvailable: true,
+                                           secureInput: true, conflictPaused: true), .secureInput)
+        XCTAssertEqual(RuntimeState.resolve(config: enabled, currentID: "abc", targetAvailable: false,
+                                           secureInput: false, conflictPaused: true), .missingSource)
+        XCTAssertEqual(RuntimeState.resolve(config: Config(sourceID: "ime", enabled: false), currentID: "abc",
+                                           targetAvailable: true, secureInput: false, conflictPaused: true), .paused)
+    }
+
     func testPriorityReflectsWhetherInterventionCanActuallyRun() {
         let enabled = Config(sourceID: "ime", enabled: true)
         let paused = Config(sourceID: "ime", enabled: false)

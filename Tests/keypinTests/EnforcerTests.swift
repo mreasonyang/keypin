@@ -16,6 +16,8 @@ final class EnforcerTests: XCTestCase {
         var cancelled: [String] = []
         var completions: [(FocusProcessResult) -> Void] = []
         var launchError: Error?
+        var uptime: TimeInterval = 0
+        var appPID: Int32? = 100
 
         func makeEnforcer() -> Enforcer {
             Enforcer(dependencies: EnforcementDependencies(
@@ -37,9 +39,101 @@ final class EnforcerTests: XCTestCase {
                     self.completions.append(completion)
                     return { self.cancelled.append(id) }
                 },
-                now: { Date(timeIntervalSince1970: 1_000) }
+                now: { Date(timeIntervalSince1970: 1_000 + self.uptime) },
+                uptime: { self.uptime }, frontmostPID: { self.appPID }
             ))
         }
+    }
+
+    func testAutomaticFightStopsBothNotificationsAndTimerCorrections() {
+        let h = Harness(); h.config = Config(sourceID: "abc", enabled: true)
+        let enforcer = h.makeEnforcer()
+        for time in 0..<3 {
+            h.uptime = Double(time); h.current = "other"
+            enforcer.kick()
+            XCTAssertEqual(h.current, "abc")
+            enforcer.kick() // successful notification echo must not refill the budget
+        }
+        h.uptime = 3; h.current = "other"
+        enforcer.kick()
+        XCTAssertTrue(enforcer.isConflictPaused)
+        for time in stride(from: 4.0, through: 16, by: 2) {
+            h.uptime = time; enforcer.kick()
+        }
+        XCTAssertEqual(h.selected.count, 3)
+        XCTAssertTrue(h.launched.isEmpty)
+        h.uptime = 18; enforcer.kick()
+        XCTAssertEqual(h.selected.count, 4)
+        XCTAssertFalse(enforcer.isConflictPaused)
+    }
+
+    func testCJKCooldownDoesNotSpendBudgetButRepeatedFocusLaunchesAreBounded() {
+        let h = Harness(); h.config.enabled = true
+        let enforcer = h.makeEnforcer()
+        for time in [0.0, 4, 8] {
+            h.uptime = time; h.current = "latin"; enforcer.kick()
+            h.current = "CJK-A"; h.completions.last?(.exited(0))
+            enforcer.kick() // helper success/echo
+            h.current = "latin"; h.uptime = time + 1
+            for _ in 0..<5 { enforcer.kick() } // cooldown checks cause no mutation
+        }
+        XCTAssertEqual(h.launched.count, 3)
+        h.uptime = 12; enforcer.kick()
+        XCTAssertTrue(enforcer.isConflictPaused)
+        h.appPID = nil // our own helper/panel is not a new enforcement context
+        h.uptime = 14; enforcer.kick()
+        h.appPID = 100; h.uptime = 16; enforcer.kick()
+        XCTAssertEqual(h.launched.count, 3)
+        XCTAssertTrue(enforcer.isConflictPaused)
+    }
+
+    func testAppTargetManualChoiceAndPauseResumeCanRecoverFromConflict() {
+        for change in ["app", "target", "manual", "pause"] {
+            let h = Harness(); h.config = Config(sourceID: "abc", enabled: true)
+            let enforcer = h.makeEnforcer()
+            for time in 0...3 {
+                h.uptime = Double(time); h.current = "other"; enforcer.kick()
+            }
+            XCTAssertTrue(enforcer.isConflictPaused)
+            h.uptime = 4
+            switch change {
+            case "app": h.appPID = 200
+            case "target": h.config.sourceID = "different"
+            case "pause":
+                h.config.enabled = false; enforcer.kick(); h.config.enabled = true
+            default: break
+            }
+            enforcer.enforce(force: change == "manual")
+            XCTAssertFalse(enforcer.isConflictPaused, change)
+            XCTAssertEqual(h.selected.count, 4, change)
+        }
+    }
+
+    func testSecureAndMissingSourceChecksDoNotSpendConflictBudget() {
+        let h = Harness(); h.config = Config(sourceID: "abc", enabled: true)
+        let enforcer = h.makeEnforcer()
+        h.secure = true
+        for _ in 0..<10 { enforcer.kick() }
+        h.secure = false; h.missing = ["abc"]
+        for _ in 0..<10 { enforcer.kick() }
+        h.missing = []
+        for time in 0..<3 {
+            h.uptime = Double(time); h.current = "other"; enforcer.kick()
+        }
+        XCTAssertEqual(h.selected.count, 3)
+        XCTAssertFalse(enforcer.isConflictPaused)
+    }
+
+    func testFailedHelpersCannotKeepTakingFocusWithoutLimit() {
+        let h = Harness(); h.config.enabled = true
+        let enforcer = h.makeEnforcer()
+        for time in [0.0, 4, 8] {
+            h.uptime = time; enforcer.kick(); h.completions.last?(.timedOut)
+        }
+        h.uptime = 12; enforcer.kick()
+        XCTAssertEqual(h.launched.count, 3)
+        XCTAssertTrue(enforcer.isConflictPaused)
+        XCTAssertFalse(enforcer.isSwitching)
     }
 
     func testRapidManualChoiceQueuesLatestEvenWhenKeepingIsOff() {

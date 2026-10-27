@@ -20,6 +20,7 @@ enum Preview {
         var loginFailed = false
         var secure = false
         var switching = false
+        var conflictPaused = false
         var switchDelay: TimeInterval = 0
         var switchGeneration = 0
         var pendingChoices: [InputChoice]?
@@ -50,6 +51,7 @@ enum Preview {
             if state == "failure" { failed = true; config.enabled = false }
             if state == "secure" { secure = true; current = choices[0] }
             if state == "switching" { switching = true; current = choices[0] }
+            if state == "conflict" { conflictPaused = true; current = choices[0] }
             if state == "delayed-switch" { switchDelay = 15 }
             if state == "waiting" || state == "error" || state == "retry-success" { current = choices[0] }
             if state == "many" || state == "first-many" || state == "long-error" || state == "many-200" {
@@ -72,6 +74,7 @@ enum Preview {
         }
 
         func apply(completion: @escaping (SwitchOutcome) -> Void) {
+            conflictPaused = false
             if secure { completion(.secureInput); return }
             if failed { completion(.failed("Preview: input source did not change")); return }
             guard let choice = choices.first(where: { $0.id == config.sourceID }) else {
@@ -132,7 +135,8 @@ enum Preview {
             sourceIcon: { id in
                 guard let url = Bundle.main.url(forResource: id, withExtension: "tiff", subdirectory: "PreviewArtwork") else { return nil }
                 return NSImage(contentsOf: url)
-            }
+            },
+            isConflictPaused: { store.conflictPaused }
         )
         let controller = AppController.shared
         controller.model = AppModel(services: services, isPreview: true)

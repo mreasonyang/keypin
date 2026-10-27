@@ -51,6 +51,8 @@
 "warn.config" = "Could not read settings. Keeping is paused. Repair the settings file, then reopen this panel.";
 "warn.switch" = "Could not switch input sources: %@";
 "warn.busy" = "A switch is already in progress. Try again shortly.";
+"warn.conflict" = "Repeated input source changes detected. Automatic keeping is paused and will retry shortly. Switch apps or try again to resume.";
+"state.conflict" = "Switching conflict · keeping paused";
 "ui.back" = "Back";
 "ui.preferences" = "Settings";
 "ui.search" = "Search input sources";

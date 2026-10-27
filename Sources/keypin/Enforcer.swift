@@ -87,6 +87,8 @@ struct EnforcementDependencies {
     var select: (String) -> Int32
     var launchFocus: (String, Bool, @escaping (FocusProcessResult) -> Void) throws -> (() -> Void)
     var now: () -> Date = Date.init
+    var uptime: () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
+    var frontmostPID: () -> Int32? = { nil }
 
     static var live: EnforcementDependencies {
         EnforcementDependencies(
@@ -104,6 +106,12 @@ struct EnforcementDependencies {
                 let job = FocusProcessJob(completion: completion)
                 try job.start(id: id, automatic: automatic)
                 return { job.cancel() }
+            },
+            frontmostPID: {
+                guard let app = NSWorkspace.shared.frontmostApplication,
+                      app.processIdentifier != ProcessInfo.processInfo.processIdentifier,
+                      app.bundleIdentifier != FocusHelperLocation.bundleIdentifier else { return nil }
+                return app.processIdentifier
             }
         )
     }
@@ -186,6 +194,7 @@ final class Enforcer: NSObject {
     private var completionDepth = 0
     private var ignoreActivationUntil = Date.distantPast
     private var nextFocusAt = Date.distantPast
+    private var automaticGuard = AutomaticSwitchGuard()
     private var started = false
     private var workspaceObservers: [NSObjectProtocol] = []
     private var timer: Timer?
@@ -206,6 +215,7 @@ final class Enforcer: NSObject {
 
     var suppressesActivation: Bool { dependencies.now() < ignoreActivationUntil }
     var isSwitching: Bool { active != nil }
+    var isConflictPaused: Bool { automaticGuard.isPaused(at: dependencies.uptime()) }
 
     /// Explicit pause cancels GUI-owned manual work without affecting a later one-time selection.
     /// Keep the active slot until the child exits, so a replacement cannot overlap that process.
@@ -263,6 +273,8 @@ final class Enforcer: NSObject {
     /// Manual requests always produce a result. A newer manual choice replaces only queued work.
     func enforce(force: Bool, finish: ((SwitchOutcome) -> Void)? = nil) {
         let config = dependencies.config()
+        automaticGuard.updateContext(target: config.sourceID, enabled: config.enabled,
+                                     appPID: dependencies.frontmostPID())
         if !force && !config.enabled {
             if let active, !active.force { cancelActive?() }
             finish?(.success)
@@ -297,11 +309,18 @@ final class Enforcer: NSObject {
             complete(request, .busy)
             return
         }
+        if request.force { automaticGuard.reset() }
+        let currentMatches = dependencies.currentID() == request.target
+        automaticGuard.observeCurrent(matchesTarget: currentMatches, at: dependencies.uptime())
+        if !request.force && isConflictPaused {
+            complete(request, .busy)
+            return
+        }
         guard !dependencies.secureInput() else {
             complete(request, .secureInput)
             return
         }
-        guard dependencies.currentID() != request.target else {
+        guard !currentMatches else {
             complete(request, .success)
             return
         }
@@ -309,12 +328,18 @@ final class Enforcer: NSObject {
             complete(request, .missingSource)
             return
         }
-        ignoreActivationUntil = dependencies.now().addingTimeInterval(1)
         if target.requiresFocus {
             guard request.force || dependencies.now() >= nextFocusAt else {
                 complete(request, .busy)
                 return
             }
+        }
+        guard request.force || automaticGuard.permitsAttempt(at: dependencies.uptime()) else {
+            complete(request, .busy)
+            return
+        }
+        ignoreActivationUntil = dependencies.now().addingTimeInterval(1)
+        if target.requiresFocus {
             nextFocusAt = dependencies.now().addingTimeInterval(3)
             do {
                 let cancellation = try dependencies.launchFocus(target.id, !request.force) { [weak self] result in

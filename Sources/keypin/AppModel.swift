@@ -16,6 +16,7 @@ struct AppServices {
     var isSwitching: () -> Bool = { false }
     var cancelSwitch: () -> Void = {}
     var sourceIcon: (String) -> NSImage? = { _ in nil }
+    var isConflictPaused: () -> Bool = { false }
 
     static var live: AppServices {
         AppServices(
@@ -34,7 +35,8 @@ struct AppServices {
             secureInput: { IsSecureEventInputEnabled() },
             isSwitching: { Enforcer.shared.isSwitching },
             cancelSwitch: { Enforcer.shared.cancelManualRequests() },
-            sourceIcon: { Catalog.icon(for: $0) }
+            sourceIcon: { Catalog.icon(for: $0) },
+            isConflictPaused: { Enforcer.shared.isConflictPaused }
         )
     }
 }
@@ -54,6 +56,7 @@ final class AppModel: ObservableObject {
     @Published var warning: String?
     @Published private(set) var secureInput = false
     @Published private(set) var automaticSwitching = false
+    @Published private(set) var conflictPaused = false
     @Published private(set) var configError = false
     @Published private(set) var showsOnboarding = false
     @Published var setupStep = 0
@@ -98,14 +101,14 @@ final class AppModel: ObservableObject {
     var canEnable: Bool { pinnedName != nil && !configError }
     var canRetrySwitch: Bool {
         !configError && !targetMissing && !switching && !automaticSwitching && !secureInput
-            && (manualWarning != nil || (enabled && automaticWarning != nil))
+            && (manualWarning != nil || (enabled && (automaticWarning != nil || conflictPaused)))
     }
     var runtimeState: RuntimeState {
         RuntimeState.resolve(config: Config(sourceID: pinnedID, enabled: enabled),
                              currentID: currentID, targetAvailable: pinnedName != nil,
                              secureInput: secureInput, switching: switching || (enabled && automaticSwitching),
                              failed: manualWarning != nil || (enabled && automaticWarning != nil),
-                             configurationError: configError)
+                             configurationError: configError, conflictPaused: conflictPaused)
     }
     var menuSourceName: String { currentName.isEmpty ? L10n.text("ui.follow-system") : currentName }
 
@@ -180,6 +183,8 @@ final class AppModel: ObservableObject {
         if secureInput != secure { secureInput = secure }
         let activeSwitch = services.isSwitching()
         if automaticSwitching != activeSwitch { automaticSwitching = activeSwitch }
+        let pausedForConflict = enabled && services.isConflictPaused()
+        if conflictPaused != pausedForConflict { conflictPaused = pausedForConflict }
         if previousCurrent != current.id && current.id == pinnedID {
             clearSwitchWarnings()
         }
@@ -191,7 +196,8 @@ final class AppModel: ObservableObject {
         let nextWarning: String?
         if configError { nextWarning = L10n.text("warn.config") }
         else {
-            let runtimeWarning = manualWarning?.message ?? (enabled ? (targetMissing ? L10n.text("warn.missing") : automaticWarning?.message) : nil)
+            let runtimeWarning = manualWarning?.message ?? (enabled ? (targetMissing ? L10n.text("warn.missing") :
+                (conflictPaused ? L10n.text("warn.conflict") : automaticWarning?.message)) : nil)
             // Keep the error detail, not a translated sentence, so changing the app
             // language also updates warnings that remain visible until recovery.
             let messages = [saveErrorDetail.map { L10n.format("warn.save", $0) }, runtimeWarning,

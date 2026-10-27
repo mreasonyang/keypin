@@ -51,6 +51,8 @@
 "warn.config" = "无法读取设置，保持已暂停。请修复设置文件后重新打开面板。";
 "warn.switch" = "无法切换输入法：%@";
 "warn.busy" = "正在切换输入法，请稍后重试。";
+"warn.conflict" = "检测到输入法反复切换，已暂缓自动保持，稍后重试。也可切换 App 或点击重试恢复。";
+"state.conflict" = "切换冲突，暂缓保持";
 "ui.back" = "返回";
 "ui.preferences" = "设置";
 "ui.search" = "搜索输入法";

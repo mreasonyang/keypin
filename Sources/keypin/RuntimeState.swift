@@ -8,13 +8,15 @@ enum RuntimeState: String, Codable, CaseIterable {
     case switching
     case waiting
     case secureInput = "secure_input"
+    case conflictPaused = "conflict_paused"
     case missingSource = "missing_source"
     case error
     case stopped
 
     static func resolve(config: Config, currentID: String, targetAvailable: Bool,
                         secureInput: Bool, switching: Bool = false, failed: Bool = false,
-                        configurationError: Bool = false, isRunning: Bool = true) -> RuntimeState {
+                        configurationError: Bool = false, isRunning: Bool = true,
+                        conflictPaused: Bool = false) -> RuntimeState {
         if configurationError { return .error }
         if !isRunning { return .stopped }
         // Following the system needs no target, including one remembered for CLI resume.
@@ -23,6 +25,7 @@ enum RuntimeState: String, Codable, CaseIterable {
         if !targetAvailable { return .missingSource }
         if secureInput { return .secureInput }
         if switching { return .switching }
+        if config.enabled && conflictPaused { return .conflictPaused }
         if failed { return .error }
         return currentID == target ? .keeping : .waiting
     }
@@ -35,6 +38,7 @@ enum RuntimeState: String, Codable, CaseIterable {
         case .switching: return "state.switching"
         case .waiting: return "state.waiting"
         case .secureInput: return "state.secure"
+        case .conflictPaused: return "state.conflict"
         case .missingSource: return "state.missing"
         case .error: return "state.error"
         case .stopped: return "state.stopped"
@@ -49,6 +53,7 @@ enum RuntimeState: String, Codable, CaseIterable {
         case .switching: return "arrow.triangle.2.circlepath"
         case .waiting: return "clock"
         case .secureInput: return "lock.shield"
+        case .conflictPaused: return "pause.circle"
         case .missingSource: return "keyboard.badge.ellipsis"
         case .error: return "exclamationmark.triangle"
         case .stopped: return "stop.circle"

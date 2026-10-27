@@ -19,6 +19,7 @@ final class AppModelTests: XCTestCase {
         var loginError = false
         var secure = false
         var activeSwitch = false
+        var conflictPaused = false
         var cancellations = 0
         var callbacks: [(SwitchOutcome) -> Void] = []
         var services: AppServices {
@@ -28,8 +29,48 @@ final class AppModelTests: XCTestCase {
                 loginEnabled: { self.loginChecks += 1; return self.login },
                 setLogin: { if self.loginError { throw NSError(domain: "login", code: 1) }; self.login = $0 },
                 apply: { self.appliedConfigs.append(self.config); self.callbacks.append($0) }, secureInput: { self.secure },
-                isSwitching: { self.activeSwitch }, cancelSwitch: { self.cancellations += 1 })
+                isSwitching: { self.activeSwitch }, cancelSwitch: { self.cancellations += 1 },
+                isConflictPaused: { self.conflictPaused })
         }
+    }
+
+    func testConflictPauseIsVisibleAndRetryableWithoutChangingSavedIntent() {
+        let store = Store(); store.config = Config(sourceID: "ime", enabled: true, language: "en")
+        store.conflictPaused = true
+        let model = AppModel(services: store.services, isPreview: true)
+        model.refresh()
+        XCTAssertEqual(model.runtimeState, .conflictPaused)
+        XCTAssertEqual(model.warning, L10n.text("warn.conflict"))
+        XCTAssertTrue(model.canRetrySwitch)
+        XCTAssertTrue(model.enabled)
+        XCTAssertEqual(store.writes, 0)
+        store.current = store.choices[1]
+        model.receiveAutomaticOutcome(.success)
+        XCTAssertEqual(model.runtimeState, .conflictPaused, "A selection echo must not claim keeping has resumed")
+        XCTAssertNotNil(model.warning)
+        model.pauseKeeping()
+        XCTAssertEqual(model.runtimeState, .paused)
+        XCTAssertNil(model.warning)
+        XCTAssertFalse(model.conflictPaused)
+    }
+
+    func testConflictRetryAndAutomaticRecoveryRefreshTheBanner() {
+        let store = Store(); store.config = Config(sourceID: "ime", enabled: true, language: "en")
+        store.conflictPaused = true
+        let model = AppModel(services: store.services, isPreview: true)
+        model.refresh(); model.retry()
+        XCTAssertEqual(store.callbacks.count, 1)
+        XCTAssertTrue(model.switching)
+        store.conflictPaused = false; store.current = store.choices[1]
+        store.callbacks[0](.success)
+        XCTAssertEqual(model.runtimeState, .keeping)
+        XCTAssertNil(model.warning)
+        XCTAssertFalse(model.canRetrySwitch)
+        store.conflictPaused = true; store.current = store.choices[0]; model.refresh()
+        XCTAssertEqual(model.runtimeState, .conflictPaused)
+        store.conflictPaused = false; model.refresh()
+        XCTAssertEqual(model.runtimeState, .waiting)
+        XCTAssertNil(model.warning)
     }
 
     func testChoosingAnInputSourceEnablesKeepingInOneWriteBeforeSwitching() {

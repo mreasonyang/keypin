@@ -51,6 +51,8 @@
 "warn.config" = "無法讀取設定，保持已暫停。請修復設定檔後重新開啟面板。";
 "warn.switch" = "無法切換輸入法：%@";
 "warn.busy" = "正在切換輸入法，請稍後再試。";
+"warn.conflict" = "偵測到輸入法反覆切換，已暫緩自動保持，稍後重試。也可切換 App 或按重試恢復。";
+"state.conflict" = "切換衝突，暫緩保持";
 "ui.back" = "返回";
 "ui.preferences" = "設定";
 "ui.search" = "搜尋輸入法";
