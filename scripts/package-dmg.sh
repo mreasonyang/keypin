@@ -19,13 +19,14 @@ cleanup() {
   exit "$status"
 }
 trap cleanup EXIT
-mkdir "$stage/content" "$stage/mounted"
-ditto "$app" "$stage/content/KeyPin.app"
-ln -s /Applications "$stage/content/Applications"
-hdiutil create -quiet -volname KeyPin -srcfolder "$stage/content" -format UDZO -fs HFS+ "$output"
+mkdir "$stage/mounted"
+dmg_python="${KEYPIN_DMG_PYTHON:-python3}"
+"$dmg_python" -m dmgbuild -s "$root/packaging/dmg/settings.py" \
+  -D "app=$app" -D "background=$root/packaging/dmg/background.png" KeyPin "$output"
 hdiutil verify "$output" >/dev/null
 hdiutil attach -quiet -readonly -nobrowse -mountpoint "$stage/mounted" "$output"
 mounted=1
+"$dmg_python" "$root/scripts/verify-dmg-layout.py" "$stage/mounted"
 [[ -L "$stage/mounted/Applications" && "$(readlink "$stage/mounted/Applications")" == /Applications ]]
 python3 - "$app" "$stage/mounted/KeyPin.app" <<'PY'
 from pathlib import Path

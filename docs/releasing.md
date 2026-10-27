@@ -109,4 +109,13 @@ Universal 新版已完成 [0.0.17 → 0.0.18 的正式远程升级及双架构�
 
 在 `main` 手动运行 **Add notarized DMG to an existing release**，输入已有稳定标签（例如 `v0.0.19`）。流程下载 GitHub 已发布的 Universal ZIP，核对 GitHub 资产摘要与大小，验证应用签名、公证票据及架构，不重新构建应用。DMG 内含原样的 `KeyPin.app` 和 `/Applications` 快捷方式；挂载比对应用内容后，再用临时钥匙串签名、公证、附加票据并验证 DMG 的 Gatekeeper 结果。
 
-发布任务只新增 DMG 和同名 `.dmg.sha256`，不覆盖原 ZIP、appcast 或校验文件，也不修改标签。已存在 DMG 时拒绝重跑覆盖。新版本的常规 Release 流程同时产出 DMG 和 Sparkle ZIP；官网三个语言的下载按钮均应使用 `https://github.com/mreasonyang/keypin/releases/download/v<version>/KeyPin-<version>-universal.dmg`，安装说明为打开 DMG 并拖入 Applications。
+发布任务只新增 DMG 和同名 `.dmg.sha256`，不覆盖原 ZIP、appcast 或校验文件，也不修改标签。已存在同名安装包时拒绝重跑覆盖。手动流程的 `revision`（默认 `2`）生成 `KeyPin-<version>-universal-rN.dmg`，保留原始 DMG；官网切换到已验证的新安装包直链。新版本的常规 Release 流程同时产出 DMG 和 Sparkle ZIP；官网三个语言的下载按钮均应使用 `https://github.com/mreasonyang/keypin/releases/download/v<version>/KeyPin-<version>-universal.dmg`，安装说明为打开 DMG 并拖入 Applications。
+
+
+### Finder 拖拽安装窗口
+
+`packaging/dmg/settings.py` 固定 640×400 的图标视图：左侧 `KeyPin.app`，右侧指向 `/Applications` 的快捷方式，中间箭头及中英文安装提示。背景同时提供 1x/2x 图片，磁盘使用应用图标。`scripts/verify-dmg-layout.py` 直接读取成品 `.DS_Store`，检查位置、背景、窗口尺寸与视图设置；`package-dmg.sh` 同时核对应用文件、符号链接、可执行权限、签名与公证票据。
+
+`dmgbuild` 及其依赖在 `packaging/dmg/requirements.txt` 固定版本和 wheel SHA-256。正式 Actions 先安装这些工具，再处理签名凭据。不要对已签名应用设置 FinderInfo 或隐藏扩展名标记；这些修改会破坏严格签名校验。
+
+本地预览仅重包现有正式应用：先在 Python 3.13 虚拟环境安装锁定依赖，再设置 `KEYPIN_DMG_PYTHON` 为该环境的 Python，运行 `bash scripts/package-dmg.sh APP OUTPUT.dmg`。背景可通过 `swift packaging/dmg/make-background.swift packaging/dmg` 重建。GUI 验收需在 Finder 中打开实际镜像；成品元数据或截图不能替代真实拖拽复制的验收记录。

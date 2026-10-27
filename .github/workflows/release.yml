@@ -35,6 +35,11 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+      - name: Install pinned Finder layout tools
+        run: python3 -m pip install --require-hashes -r packaging/dmg/requirements.txt
       - name: Validate exact tag and required signing configuration
         id: source
         env:
