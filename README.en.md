@@ -36,7 +36,7 @@ For detailed panel mechanics, onboarding flows, and state definitions, see the [
 
 ### Using a Pre-built App Bundle
 
-Download a published Universal ZIP from [GitHub Releases](https://github.com/mreasonyang/keypin/releases). The same archive supports Apple silicon and Intel Macs. Extract it, then:
+Download the Universal DMG directly from GitHub Releases using the [website](https://keypin.kyun.si). The same installer supports Apple silicon and Intel Macs. Open the DMG and drag `KeyPin.app` to the `Applications` shortcut, then:
 
 1. Move the app to its permanent location (such as `/Applications`) before opening it. If you plan to enable launch at login, settle the app location first.
 2. Double-click to launch.

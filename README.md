@@ -36,7 +36,7 @@ KeyPin 是一款轻量的 macOS 菜单栏工具。在不同应用（如终端、
 
 ### 使用预编译应用包
 
-从 [GitHub Releases](https://github.com/mreasonyang/keypin/releases) 下载已发布的 Universal ZIP 并解压，同一个安装包适用于 Apple silicon 和 Intel Mac。获得 `KeyPin.app` 后：
+从[官网](https://keypin.kyun.si)直接下载 GitHub Releases 上的 Universal DMG，同一个安装包适用于 Apple silicon 和 Intel Mac。打开 DMG 后，将 `KeyPin.app` 拖入 `Applications` 快捷方式。然后：
 
 1. 将应用移至准备长期放置的目录（建议置于「应用程序」`/Applications`）。若需开启「登录时启动」，请务必在移动位置后再开启。
 2. 双击打开即可开始使用。
