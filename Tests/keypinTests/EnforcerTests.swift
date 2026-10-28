@@ -18,6 +18,7 @@ final class EnforcerTests: XCTestCase {
         var launchError: Error?
         var uptime: TimeInterval = 0
         var appPID: Int32? = 100
+        var diagnostics: [DiagnosticSwitch] = []
 
         func makeEnforcer() -> Enforcer {
             Enforcer(dependencies: EnforcementDependencies(
@@ -40,9 +41,42 @@ final class EnforcerTests: XCTestCase {
                     return { self.cancelled.append(id) }
                 },
                 now: { Date(timeIntervalSince1970: 1_000 + self.uptime) },
-                uptime: { self.uptime }, frontmostPID: { self.appPID }
+                uptime: { self.uptime }, frontmostPID: { self.appPID },
+                recordDiagnostics: { self.diagnostics.append($0) }
             ))
         }
+    }
+
+    func testDiagnosticsDistinguishSelectionFailureUnconfirmedAndRecovery() throws {
+        let h = Harness(); h.config.sourceID = "abc"; h.selectionStatus = -50
+        let enforcer = h.makeEnforcer()
+        enforcer.enforce(force: true)
+        XCTAssertEqual(h.diagnostics.last?.reason, .selectionFailed)
+        XCTAssertEqual(h.diagnostics.last?.statusCode, -50)
+        h.selectionStatus = 0; h.selectionActuallyChanges = false
+        enforcer.enforce(force: true)
+        XCTAssertEqual(h.diagnostics.last?.reason, .unconfirmed)
+        h.selectionActuallyChanges = true
+        enforcer.enforce(force: true)
+        XCTAssertEqual(h.diagnostics.last?.outcome, .success)
+        XCTAssertEqual(h.diagnostics.count, 3)
+    }
+
+    func testHelperDiagnosticsKeepCodesButExcludeArbitraryLaunchErrorText() throws {
+        let h = Harness()
+        let enforcer = h.makeEnforcer()
+        enforcer.enforce(force: true); h.completions[0](.timedOut)
+        XCTAssertEqual(h.diagnostics.last?.reason, .helperTimeout)
+        enforcer.enforce(force: true); h.completions[1](.exited(FocusHelper.secureExit))
+        XCTAssertEqual(h.diagnostics.last?.outcome, .secureInput)
+        XCTAssertEqual(h.diagnostics.last?.statusCode, FocusHelper.secureExit)
+        h.launchError = NSError(domain: "fixture", code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "PRIVATE_DIAGNOSTIC_MESSAGE_SHOULD_NOT_BE_WRITTEN"])
+        enforcer.enforce(force: true)
+        XCTAssertEqual(h.diagnostics.last?.reason, .launchFailed)
+        let json = String(decoding: try JSONEncoder().encode(h.diagnostics), as: UTF8.self)
+        XCTAssertFalse(json.contains("PRIVATE_DIAGNOSTIC_MESSAGE_SHOULD_NOT_BE_WRITTEN"))
+        XCTAssertFalse(json.contains("CJK-A"), "Input source identifiers must not leak through error messages")
     }
 
     func testAutomaticFightStopsBothNotificationsAndTimerCorrections() {

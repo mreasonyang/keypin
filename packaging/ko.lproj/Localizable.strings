@@ -1,4 +1,10 @@
 "app.name" = "KeyPin";
+"ui.diagnostic-logs" = "진단 로그 열기…";
+"panel.diagnostic-metadata" = "앱 식별 정보 기록";
+"warn.diagnostic-cleanup" = "앱 식별 정보 기록은 꺼졌지만 일부 기존 로그에서 삭제하지 못했습니다. 공유하기 전에 로그 폴더를 확인하세요.";
+"panel.diagnostic-metadata-help" = "기본값은 꺼짐입니다. 켜면 보안 입력 중 앱 ID와 PID를 기록하며, 끄면 기존 로그에서도 삭제합니다.";
+"ui.diagnostic-logs-help" = "이 Mac에 7일간 최대 1.5 MiB 보관합니다. 앱 식별 정보는 기본으로 꺼져 있으며 입력 내용은 기록하지 않습니다.";
+"warn.diagnostic-logs" = "진단 로그 폴더를 열 수 없습니다. Library/Logs/KeyPin에 쓸 수 있는 권한이 있는지 확인하세요.";
 "app.tooltip" = "%@: %@";
 "menu.edit" = "편집";
 "menu.undo" = "실행 취소";

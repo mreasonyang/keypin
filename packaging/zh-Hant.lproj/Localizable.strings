@@ -1,4 +1,10 @@
 "app.name" = "KeyPin";
+"ui.diagnostic-logs" = "開啟診斷日誌…";
+"panel.diagnostic-metadata" = "記錄應用程式識別資訊";
+"warn.diagnostic-cleanup" = "已停止記錄應用程式識別資訊，但未能清除所有舊日誌中的識別資訊。分享日誌前請檢查日誌資料夾。";
+"panel.diagnostic-metadata-help" = "預設關閉。啟用後僅在安全輸入期間記錄應用程式 ID 和 PID；關閉後清除現有日誌中的這些識別資訊。";
+"ui.diagnostic-logs-help" = "本機狀態日誌，保留 7 天，最多 1.5 MiB。應用程式識別資訊預設關閉，不記錄輸入內容。";
+"warn.diagnostic-logs" = "無法開啟診斷日誌資料夾。請檢查目前使用者是否有權寫入 Library/Logs/KeyPin。";
 "app.tooltip" = "%@：%@";
 "menu.edit" = "編輯";
 "menu.undo" = "還原";

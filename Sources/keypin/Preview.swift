@@ -21,6 +21,7 @@ enum Preview {
         var secure = false
         var switching = false
         var conflictPaused = false
+        var diagnosticMetadataEnabled = false
         var switchDelay: TimeInterval = 0
         var switchGeneration = 0
         var pendingChoices: [InputChoice]?
@@ -136,7 +137,9 @@ enum Preview {
                 guard let url = Bundle.main.url(forResource: id, withExtension: "tiff", subdirectory: "PreviewArtwork") else { return nil }
                 return NSImage(contentsOf: url)
             },
-            isConflictPaused: { store.conflictPaused }
+            isConflictPaused: { store.conflictPaused },
+            diagnosticMetadataEnabled: { store.diagnosticMetadataEnabled },
+            setDiagnosticMetadataEnabled: { store.diagnosticMetadataEnabled = $0 }
         )
         let controller = AppController.shared
         controller.model = AppModel(services: services, isPreview: true)

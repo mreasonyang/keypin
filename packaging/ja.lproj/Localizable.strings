@@ -1,4 +1,10 @@
 "app.name" = "KeyPin";
+"ui.diagnostic-logs" = "診断ログを開く…";
+"panel.diagnostic-metadata" = "アプリ識別情報を記録";
+"warn.diagnostic-cleanup" = "アプリ識別情報の記録はオフになりましたが、一部の既存ログから削除できませんでした。共有前にログフォルダを確認してください。";
+"panel.diagnostic-metadata-help" = "初期設定はオフ。オンにすると安全な入力中のアプリ ID と PID を記録し、オフにすると既存ログからも削除します。";
+"ui.diagnostic-logs-help" = "この Mac に最大 1.5 MiB、7 日間保存。アプリ識別情報は初期設定でオフ。入力内容は記録しません。";
+"warn.diagnostic-logs" = "診断ログフォルダを開けませんでした。Library/Logs/KeyPin への書き込み権限を確認してください。";
 "app.tooltip" = "%@: %@";
 "menu.edit" = "編集";
 "menu.undo" = "取り消す";

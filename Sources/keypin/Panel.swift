@@ -211,6 +211,18 @@ struct Panel: View {
 
     // MARK: Settings
 
+    private func openDiagnosticLogs() {
+        guard !model.isPreview else { return }
+        do {
+            let directory = try DiagnosticLogStore.shared.prepareDirectory()
+            guard NSWorkspace.shared.open(directory) else { throw CocoaError(.fileReadUnknown) }
+        } catch {
+            let alert = NSAlert()
+            alert.messageText = L10n.text("warn.diagnostic-logs")
+            alert.runModal()
+        }
+    }
+
     private func backHeader(_ title: String, to destination: PanelPage) -> some View {
         PanelHeader(inWindow: inWindow, title: title) {
             Button { page = destination } label: { Image(systemName: "chevron.left") }
@@ -279,6 +291,22 @@ struct Panel: View {
             navigationRow(title: L10n.text("ui.keyboard-settings"), accessory: "arrow.up.forward", id: "settings-keyboard") {
                 openKeyboardSettings(isPreview: model.isPreview)
             }
+            navigationRow(title: L10n.text("ui.diagnostic-logs"), accessory: "folder", id: "diagnostic-logs") {
+                openDiagnosticLogs()
+            }
+            .help(L10n.text("ui.diagnostic-logs-help"))
+            settingsRow(L10n.text("panel.diagnostic-metadata")) {
+                Toggle(L10n.text("panel.diagnostic-metadata"),
+                       isOn: Binding(get: { model.diagnosticMetadataEnabled }, set: model.setDiagnosticMetadataEnabled))
+                    .labelsHidden().toggleStyle(.switch).controlSize(.mini)
+                    .accessibilityLabel(L10n.text("panel.diagnostic-metadata"))
+                    .accessibilityHint(L10n.text("panel.diagnostic-metadata-help"))
+                    .accessibilityIdentifier("diagnostic-metadata")
+            }
+            Text(L10n.text("panel.diagnostic-metadata-help"))
+                .font(.system(size: 10.5)).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 8).padding(.bottom, 6)
             navigationRow(title: L10n.text("about.title"), accessory: updates.pendingUpdateVersion == nil ? "chevron.right" : "arrow.down.circle.fill", id: "about") { page = .about }
 
             settingsDivider

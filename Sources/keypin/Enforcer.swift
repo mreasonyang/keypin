@@ -89,6 +89,7 @@ struct EnforcementDependencies {
     var now: () -> Date = Date.init
     var uptime: () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
     var frontmostPID: () -> Int32? = { nil }
+    var recordDiagnostics: (DiagnosticSwitch) -> Void = { _ in }
 
     static var live: EnforcementDependencies {
         EnforcementDependencies(
@@ -112,7 +113,8 @@ struct EnforcementDependencies {
                       app.processIdentifier != ProcessInfo.processInfo.processIdentifier,
                       app.bundleIdentifier != FocusHelperLocation.bundleIdentifier else { return nil }
                 return app.processIdentifier
-            }
+            },
+            recordDiagnostics: { RuntimeDiagnostics.shared.recordSwitch($0) }
         )
     }
 }
@@ -281,6 +283,7 @@ final class Enforcer: NSObject {
             return
         }
         guard let target = config.sourceID, !target.isEmpty else {
+            dependencies.recordDiagnostics(DiagnosticSwitch(automatic: !force, outcome: .missingSource))
             finish?(.missingSource)
             return
         }
@@ -348,15 +351,15 @@ final class Enforcer: NSObject {
                 if active?.token == request.token { cancelActive = cancellation }
                 onUpdate?()
             } catch {
-                complete(request, .failed(L10n.format("enf.focus", error.localizedDescription)))
+                complete(request, .failed(L10n.format("enf.focus", error.localizedDescription)), reason: .launchFailed)
             }
             return
         }
         let status = dependencies.select(target.id)
         if status != noErr {
-            complete(request, .failed(L10n.format("enf.switch", target.id, status)))
+            complete(request, .failed(L10n.format("enf.switch", target.id, status)), reason: .selectionFailed, statusCode: status)
         } else if dependencies.currentID() != target.id {
-            complete(request, .failed(L10n.format("enf.unconfirmed", target.id)))
+            complete(request, .failed(L10n.format("enf.unconfirmed", target.id)), reason: .unconfirmed)
         } else {
             complete(request, .success)
         }
@@ -374,27 +377,30 @@ final class Enforcer: NSObject {
             return
         }
         switch result {
-        case .cancelled: complete(request, .busy)
-        case .timedOut: complete(request, .failed(L10n.text("enf.timeout")))
-        case .exited(FocusHelper.secureExit): complete(request, .secureInput)
-        case .exited(FocusHelper.staleExit): complete(request, .busy)
-        case .exited(FocusHelper.missingExit): complete(request, .missingSource)
+        case .cancelled: complete(request, .busy, reason: .helperCancelled)
+        case .timedOut: complete(request, .failed(L10n.text("enf.timeout")), reason: .helperTimeout)
+        case .exited(FocusHelper.secureExit): complete(request, .secureInput, reason: .helperExit, statusCode: FocusHelper.secureExit)
+        case .exited(FocusHelper.staleExit): complete(request, .busy, reason: .helperExit, statusCode: FocusHelper.staleExit)
+        case .exited(FocusHelper.missingExit): complete(request, .missingSource, reason: .helperExit, statusCode: FocusHelper.missingExit)
         case .exited(let status) where status != 0:
-            complete(request, .failed(L10n.format("enf.helper-exit", status)))
+            complete(request, .failed(L10n.format("enf.helper-exit", status)), reason: .helperExit, statusCode: status)
         case .exited:
             let outcome: SwitchOutcome = dependencies.currentID() == request.target
                 ? .success : .failed(L10n.format("enf.unconfirmed", request.target))
-            complete(request, outcome)
+            complete(request, outcome, reason: outcome == .success ? .helperExit : .unconfirmed, statusCode: 0)
         }
     }
 
-    private func complete(_ request: Request, _ outcome: SwitchOutcome) {
+    private func complete(_ request: Request, _ outcome: SwitchOutcome,
+                          reason: DiagnosticSwitch.Reason? = nil, statusCode: Int32? = nil) {
         guard active?.token == request.token else { return }
         completionDepth += 1
         active = nil
         cancelActive = nil
         cancelledManualToken = nil
         onUpdate?()
+        dependencies.recordDiagnostics(DiagnosticSwitch(automatic: !request.force, outcome: outcome,
+                                                        reason: reason, statusCode: statusCode))
         if !request.force && outcome != .busy { onAutomaticOutcome?(outcome) }
         request.finish?(outcome)
         completionDepth -= 1

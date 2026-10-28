@@ -17,6 +17,9 @@ struct AppServices {
     var cancelSwitch: () -> Void = {}
     var sourceIcon: (String) -> NSImage? = { _ in nil }
     var isConflictPaused: () -> Bool = { false }
+    var recordDiagnostics: (DiagnosticSnapshot) -> Void = { _ in }
+    var diagnosticMetadataEnabled: () -> Bool = { false }
+    var setDiagnosticMetadataEnabled: (Bool) -> Void = { _ in }
 
     static var live: AppServices {
         AppServices(
@@ -36,7 +39,22 @@ struct AppServices {
             isSwitching: { Enforcer.shared.isSwitching },
             cancelSwitch: { Enforcer.shared.cancelManualRequests() },
             sourceIcon: { Catalog.icon(for: $0) },
-            isConflictPaused: { Enforcer.shared.isConflictPaused }
+            isConflictPaused: { Enforcer.shared.isConflictPaused },
+            recordDiagnostics: { RuntimeDiagnostics.shared.observe($0) },
+            diagnosticMetadataEnabled: { DiagnosticPreferences.includeApplicationMetadata },
+            setDiagnosticMetadataEnabled: { enabled in
+                UserDefaults.standard.set(enabled, forKey: DiagnosticPreferences.metadataKey)
+                if !enabled {
+                    DiagnosticLogStore.shared.maintain { success in
+                        guard !success else { return }
+                        DispatchQueue.main.async {
+                            let alert = NSAlert()
+                            alert.messageText = L10n.text("warn.diagnostic-cleanup")
+                            alert.runModal()
+                        }
+                    }
+                }
+            }
         )
     }
 }
@@ -54,6 +72,7 @@ final class AppModel: ObservableObject {
     @Published var switching = false
     @Published var language: String?
     @Published var warning: String?
+    @Published private(set) var diagnosticMetadataEnabled = false
     @Published private(set) var secureInput = false
     @Published private(set) var automaticSwitching = false
     @Published private(set) var conflictPaused = false
@@ -144,6 +163,8 @@ final class AppModel: ObservableObject {
 
     /// Input-source notifications never launch a process or resize the window.
     func refresh() {
+        let metadataEnabled = services.diagnosticMetadataEnabled()
+        if diagnosticMetadataEnabled != metadataEnabled { diagnosticMetadataEnabled = metadataEnabled }
         let previousTarget = pinnedID
         let wasEnabled = enabled
         let previousCurrent = currentID
@@ -205,6 +226,9 @@ final class AppModel: ObservableObject {
             nextWarning = messages.isEmpty ? nil : messages.joined(separator: "\n")
         }
         if warning != nextWarning { warning = nextWarning }
+        services.recordDiagnostics(DiagnosticSnapshot(state: runtimeState, secureInput: secureInput,
+            keepingEnabled: enabled, targetAvailable: pinnedName != nil,
+            currentMatchesTarget: currentID == pinnedID, configurationError: configError))
     }
 
     func receiveAutomaticOutcome(_ outcome: SwitchOutcome) {
@@ -302,6 +326,11 @@ final class AppModel: ObservableObject {
 
     func setLanguage(_ code: String?) {
         _ = update { $0.language = L10n.normalized(code) }
+    }
+
+    func setDiagnosticMetadataEnabled(_ enabled: Bool) {
+        services.setDiagnosticMetadataEnabled(enabled)
+        refresh()
     }
 
     var setupSourceName: String? { sources.first { $0.id == setupSourceID }?.name }

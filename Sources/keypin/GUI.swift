@@ -36,6 +36,12 @@ final class AppController: NSObject, NSApplicationDelegate {
 
     private var maximumPanelHeight: CGFloat { previewHeight ?? 580 }
 
+    func applicationWillTerminate(_ notification: Notification) {
+        guard !model.isPreview else { return }
+        RuntimeDiagnostics.shared.finish()
+        DiagnosticLogStore.shared.flush()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         if let iconURL = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),

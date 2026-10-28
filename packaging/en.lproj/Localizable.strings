@@ -1,4 +1,10 @@
 "app.name" = "KeyPin";
+"ui.diagnostic-logs" = "Open Diagnostic Logs…";
+"panel.diagnostic-metadata" = "Include app identifiers";
+"warn.diagnostic-cleanup" = "App identifier recording is off, but older identifiers could not be removed from every log file. Check the logs folder before sharing files.";
+"panel.diagnostic-metadata-help" = "Off by default. Adds app IDs and PIDs during secure input; turning it off removes them from existing logs.";
+"ui.diagnostic-logs-help" = "Local status records: 7-day retention, up to 1.5 MiB. App identifiers are off by default; no typed content.";
+"warn.diagnostic-logs" = "Could not open the diagnostic logs folder. Check that your user account can write to Library/Logs/KeyPin.";
 "app.tooltip" = "%@: %@";
 "menu.edit" = "Edit";
 "menu.undo" = "Undo";

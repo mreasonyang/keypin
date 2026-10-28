@@ -1,4 +1,10 @@
 "app.name" = "KeyPin";
+"ui.diagnostic-logs" = "打开诊断日志…";
+"panel.diagnostic-metadata" = "记录应用标识";
+"warn.diagnostic-cleanup" = "已停止记录应用标识，但未能清除所有旧日志中的标识。分享日志前请检查日志文件夹。";
+"panel.diagnostic-metadata-help" = "默认关闭。开启后仅在安全输入期间记录应用 ID 和 PID；关闭后清除现有日志中的这些标识。";
+"ui.diagnostic-logs-help" = "本地状态日志，保留 7 天，最多 1.5 MiB。应用标识默认关闭，不记录输入内容。";
+"warn.diagnostic-logs" = "无法打开诊断日志文件夹。请检查当前用户是否有权写入 Library/Logs/KeyPin。";
 "app.tooltip" = "%@：%@";
 "menu.edit" = "编辑";
 "menu.undo" = "撤销";

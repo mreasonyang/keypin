@@ -116,6 +116,8 @@ For full command arguments, JSON schemas, error codes, and paths, see the [CLI a
 
 ## Privacy and Data
 
+- **Local Diagnostics**: Open `~/Library/Logs/KeyPin/` from Settings. Basic logs contain states, observed durations and fixed error codes. App identifiers are off by default and require explicit opt-in. No keystrokes, typed text or window titles are recorded or actively uploaded. Logs expire after 7 days with hourly cleanup while running, are capped at 1.5 MiB, and emit at most 60 records per rolling minute per GUI process. See [diagnostic details](docs/diagnostics.md) (in Chinese).
+
 - **Completely On-Device**: KeyPin requires no account. All input switching, enforcement, and preferences remain strictly on your Mac.
 - **Update Connections**: Official builds contact GitHub and its asset delivery services when you request an update check or enable automatic checks. Sparkle verifies update signatures. System profiling is disabled, and KeyPin does not upload typed text or input-source configuration. Local builds without an update public key do not start the update service.
 - **Configuration Storage**: User preferences are saved in JSON format at:
