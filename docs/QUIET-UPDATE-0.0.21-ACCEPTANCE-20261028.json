@@ -1,0 +1,151 @@
+{
+  "version": "0.0.21",
+  "build": 22,
+  "sourceCommit": "d3bba05944e1cd7a99cbba75095f483b166d9cfa",
+  "ciRun": 40627001505,
+  "releaseRun": 40627879928,
+  "localTestsPerArchitecture": 165,
+  "candidateChecks": {
+    "uploadedAssetHashes": true,
+    "sparkleTrustContinuity": true,
+    "appBundleAndUniversalComponents": true,
+    "appGatekeeper": true,
+    "appNotarizationTicket": true,
+    "dmgSignature": true,
+    "dmgGatekeeper": true,
+    "dmgNotarizationTicket": true,
+    "arm64CLI": true,
+    "rosettaCLI": true,
+    "focusHelperRejectsCLI": true,
+    "appcastMetadata": true,
+    "mountedDMGAppMatchesZIP": true,
+    "applicationsShortcut": true
+  },
+  "assets": {
+    "KeyPin-0.0.21-universal.zip": {
+      "bytes": 3413369,
+      "sha256": "2ffc75c63ac1a468e366f94857bd9ff5278eddf05290a2dd10e1613c1d706090"
+    },
+    "KeyPin-0.0.21-universal.dmg": {
+      "bytes": 4245639,
+      "sha256": "e6c95b41c70f953a0baf91ecd26f956d4dd3be5dc649b9ede9d880c6758ec244"
+    },
+    "appcast.xml": {
+      "bytes": 1260,
+      "sha256": "ffb1b8b06d6f09b76b79505ee640d6fe9c67c2302cb896ae2b0112c082933358"
+    },
+    "verification.json": {
+      "bytes": 827,
+      "sha256": "f2611e58d80f15b4271d2fce5ed169c88b111e5ae37d5b2156687d1e8c8ba271"
+    }
+  },
+  "candidateFirstDesktopLaunchVisibleWindows": 0,
+  "installationAcceptance": "passed",
+  "productionUpgrade": {
+    "passed": true,
+    "observations": [
+      {
+        "time": "2026-10-28T03:51:04.278436+00:00",
+        "version": "0.0.20",
+        "build": "21",
+        "pids": [
+          53248
+        ]
+      },
+      {
+        "time": "2026-10-28T03:51:07.589068+00:00",
+        "version": "0.0.21",
+        "build": "22",
+        "pids": []
+      },
+      {
+        "time": "2026-10-28T03:51:08.677925+00:00",
+        "version": "0.0.21",
+        "build": "22",
+        "pids": [
+          53445
+        ]
+      }
+    ],
+    "postRelaunchWindows": [
+      {
+        "pid": 53445,
+        "visibleStandardWindows": 0,
+        "time": "2026-10-28T03:51:11.742722+00:00"
+      },
+      {
+        "pid": 53445,
+        "visibleStandardWindows": 0,
+        "time": "2026-10-28T03:51:18.799854+00:00"
+      }
+    ]
+  },
+  "publicAssetReadback": {
+    "passed": true,
+    "assets": {
+      "KeyPin-0.0.21-universal.zip": {
+        "match": true,
+        "bytes": 3413369,
+        "sha256": "2ffc75c63ac1a468e366f94857bd9ff5278eddf05290a2dd10e1613c1d706090"
+      },
+      "KeyPin-0.0.21-universal.dmg.sha256": {
+        "match": true,
+        "bytes": 94,
+        "sha256": "261216b9494fb93883e7b9b7c4ce9b4c79010ffb980b38aef5b88fe5d953f0a7"
+      },
+      "KeyPin-0.0.21-universal.dmg": {
+        "match": true,
+        "bytes": 4245639,
+        "sha256": "e6c95b41c70f953a0baf91ecd26f956d4dd3be5dc649b9ede9d880c6758ec244"
+      },
+      "appcast.xml": {
+        "match": true,
+        "bytes": 1260,
+        "sha256": "ffb1b8b06d6f09b76b79505ee640d6fe9c67c2302cb896ae2b0112c082933358"
+      },
+      "verification.json": {
+        "match": true,
+        "bytes": 827,
+        "sha256": "f2611e58d80f15b4271d2fce5ed169c88b111e5ae37d5b2156687d1e8c8ba271"
+      },
+      "SHA256SUMS": {
+        "match": true,
+        "bytes": 350,
+        "sha256": "5f6fcbc1c4ca4b1007aa13b8e19baa72afd366a65ab4a5fe50ff155f86c3efdc"
+      }
+    },
+    "productionLatestFeedMatchesCandidate": true
+  },
+  "finalPreservation": {
+    "passed": true,
+    "checks": {
+      "installedAppMatchesPublishedZIP": true,
+      "inputConfigurationPreserved": true,
+      "loginItemPreserved": true,
+      "cliLinkPreserved": true,
+      "SUEnableAutomaticChecksPreserved": true,
+      "SUAutomaticallyUpdatePreserved": true,
+      "installedSignature": true,
+      "installedGatekeeper": true,
+      "installedTicket": true
+    }
+  },
+  "nativeAboutVersion": "0.0.21 (22)",
+  "explicitReopenShowsWindow": true,
+  "finalVisibleStandardWindows": 0,
+  "productionUpgradeBaseline": {
+    "version": "0.0.20",
+    "build": 21,
+    "binaryMatchedPublishedArchive": true,
+    "restoredOriginalAbsentLaunchRecordAfterDraftTesting": true,
+    "bundleMetadataAndUpdateTrustUnmodified": true
+  },
+  "host": {
+    "macOS": "27.0.1",
+    "architecture": "arm64"
+  },
+  "unattendedAutomaticUpdateTested": false,
+  "physicalIntelInteractiveAcceptance": false,
+  "macOS13Or14InteractiveAcceptance": false,
+  "newRealCJKInputAcceptance": false
+}
