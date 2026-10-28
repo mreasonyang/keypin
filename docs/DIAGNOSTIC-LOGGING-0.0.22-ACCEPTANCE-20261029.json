@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "tag": "v0.0.22",
+  "version": "0.0.22",
+  "build": 23,
+  "commit": "baf5c2d035b472a99808d251687fea2a01487f64",
+  "releaseURL": "https://github.com/mreasonyang/keypin/releases/tag/v0.0.22",
+  "mainCI": "https://github.com/mreasonyang/keypin/actions/runs/40739009149",
+  "releaseWorkflow": "https://github.com/mreasonyang/keypin/actions/runs/40740645245",
+  "installationAcceptance": "passed",
+  "assets": {
+    "KeyPin-0.0.22-universal.zip": {
+      "bytes": 3698698,
+      "sha256": "7e62a8c8475b5db9ccd7d764a0f05d60aedb512ad892dc0c821d9b15979cead5"
+    },
+    "KeyPin-0.0.22-universal.dmg": {
+      "bytes": 4567395,
+      "sha256": "d30b54539b4d45d1f350f7d90a7779c005c096c18be2653b2bf322e71b6953a3"
+    },
+    "appcast.xml": {
+      "bytes": 1260,
+      "sha256": "5baa0b7a0c33e3fb6dcde4dccbeaf948655b1978863d62abf739312888856e86"
+    },
+    "verification.json": {
+      "bytes": 827,
+      "sha256": "2cbdef905cb9c6549d2917382036cd6275465de2d5a7fae905a73b439d5903e4"
+    }
+  },
+  "packageChecks": {
+    "manifestSHA256": true,
+    "remoteSigningReceipt": true,
+    "universalBundle": true,
+    "appStaple": true,
+    "appGatekeeper": true,
+    "dmgSignature": true,
+    "dmgStaple": true,
+    "dmgGatekeeper": true,
+    "archivePublicKeySignature": true,
+    "updatePublicKeyUnchanged": true,
+    "dmgAppMatchesZIP": true
+  },
+  "installed": {
+    "version": "0.0.22",
+    "build": "23",
+    "productionSparkleUpgrade": true,
+    "installedAppMatchesPublicZIP": true,
+    "strictSignatureStapleGatekeeper": true,
+    "configurationPreserved": {
+      "config": true,
+      "login": true,
+      "cliLink": true
+    },
+    "singleNativeInstalledProcess": true,
+    "finalVisibleStandardWindows": 0,
+    "metadataDefaultOff": true,
+    "postUpgradeLogSessionPresent": true,
+    "postUpgradeForeignAppMetadataAbsent": true,
+    "automaticUpdatePreferencesOff": true,
+    "localArchitecture": "arm64",
+    "macOSVersion": "27.0.1",
+    "oldBaselineMatchesPublicRelease": true
+  },
+  "controlledSecureInput": {
+    "observedDurationSeconds": 9.672,
+    "warningAppearedAndCleared": true,
+    "foreignAppMetadataAbsent": true,
+    "typedProbeTextAbsent": true,
+    "directoryMode": "0700",
+    "fileMode": "0600"
+  },
+  "quietRelaunch": {
+    "windowCounts": [
+      0,
+      0
+    ],
+    "secondsAfterRelaunch": [
+      2.16,
+      6.76
+    ]
+  },
+  "tests": {
+    "nativeXCTest": 189,
+    "cloudDualArchitecture": "passed",
+    "macOS15Arm64AndIntelRuntime": "passed",
+    "localizedSettingsPreviews": 10,
+    "localIntelExecution": false
+  },
+  "remaining": [
+    "physical Intel device acceptance",
+    "macOS 13/14 runtime acceptance",
+    "unattended automatic-update acceptance",
+    "new real Chinese composition and long cross-app/sleep-wake acceptance"
+  ]
+}

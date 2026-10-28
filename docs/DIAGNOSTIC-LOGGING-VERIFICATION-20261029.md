@@ -1,5 +1,7 @@
 # 诊断日志验证 · 2026-10-29
 
+以下为发布前开发阶段记录。后续已完成正式发布及真实生产更新，当前状态见 [0.0.22 发布验收](DIAGNOSTIC-LOGGING-0.0.22-ACCEPTANCE-20261029.md)。
+
 实现位于 `fix/diagnostic-logging`，基于当前正式版 0.0.21（22）。已生成本机 arm64 开发候选包 `build/KeyPin.app`，版本号未提升；该包为 ad-hoc 签名、未公证的开发包，不是新的正式发布。未替换 `/Applications/KeyPin.app`，未推送或发布。
 
 ## 验证结果
