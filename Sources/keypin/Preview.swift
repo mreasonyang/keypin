@@ -158,7 +158,7 @@ enum Preview {
         controller.previewPopover = arguments.contains("popover")
         controller.previewHeight = arguments.contains("short") ? 420 : nil
         configureTransitions(state: state, store: store, model: controller.model)
-        controller.openWindowOnLaunch = true
+        controller.launchMode = .explicitWindow
         NSApplication.shared.appearance = NSAppearance(named: appearance == "dark" ? .darkAqua : .aqua)
         if state == "first-confirm" || arguments.contains("--smoke-test") {
             // Exercise real window creation and layout on CI's older macOS runtime.

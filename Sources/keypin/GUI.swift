@@ -24,7 +24,7 @@ final class AppController: NSObject, NSApplicationDelegate {
     private var editingMenuItem: NSMenuItem?
     private var editingCommands: [(item: NSMenuItem, key: String)] = []
     private var editingMenuLanguage: String?
-    var openWindowOnLaunch = false
+    var launchMode: GUILaunchMode = .background
     var model = AppModel.shared
     var previewSettings = false
     var previewAbout = false
@@ -47,6 +47,10 @@ final class AppController: NSObject, NSApplicationDelegate {
         configurePopover()
         configureStatusItem()
         model.start()
+        let openWindowOnLaunch = model.isPreview ? true : LaunchPresentation.recordLaunch(
+            mode: launchMode, requiresAttention: model.showsOnboarding || model.configError,
+            build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        )
         // Lifetime belongs to the GUI, never the About view, CLI, or focus helper.
         // Keep the instance lock until process exit; Sparkle waits for termination
         // before installing/reopening, and LaunchAgent only restarts failed exits.

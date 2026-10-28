@@ -25,14 +25,14 @@ enum Entry {
         #endif
         L10n.languageCode = L10n.normalized(ConfigStore.load().language)
         // background：登录项悄悄留在菜单栏，不弹窗口。
-        // gui，或从访达 / open 启动：菜单栏加上设置窗口。
+        // gui：明确打开窗口；桌面启动由 GUI 根据构建号判断是否为更新后重启。
         if arguments.first == "gui" || arguments.first == "background" {
-            AppController.shared.openWindowOnLaunch = arguments.first == "gui"
+            AppController.shared.launchMode = arguments.first == "gui" ? .explicitWindow : .background
             launchGUI()
             return
         }
         if arguments.isEmpty && launchedFromDesktop() {
-            AppController.shared.openWindowOnLaunch = true
+            AppController.shared.launchMode = .desktop
             launchGUI()
             return
         }
