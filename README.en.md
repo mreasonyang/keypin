@@ -35,6 +35,19 @@ For detailed panel mechanics, onboarding flows, and state definitions, see the [
 
 ## Installation
 
+### Using Homebrew
+
+```sh
+brew install --cask mreasonyang/taps/keypin
+open -a KeyPin
+```
+
+The maintainer's [Homebrew tap](https://github.com/mreasonyang/homebrew-taps) installs the signed, notarized Universal app and provides the `keypin` command. Open the app to choose your input source and launch-at-login preference.
+
+Use in-app updates or run `brew update && brew upgrade --cask mreasonyang/taps/keypin`. If you manually installed an identical copy of the current official release, use `brew install --cask --adopt mreasonyang/taps/keypin` to adopt it.
+
+Before uninstalling, turn off launch at login in Settings (or run `keypin uninstall`), then run `brew uninstall --cask mreasonyang/taps/keypin`. Preferences and diagnostic logs are preserved. To also remove those files and the login agent, use `brew uninstall --cask --zap mreasonyang/taps/keypin`.
+
 ### Using a Pre-built App Bundle
 
 Download the Universal DMG directly from GitHub Releases using the [website](https://keypin.kyun.si). The same installer supports Apple silicon and Intel Macs. Open the DMG and drag `KeyPin.app` to the `Applications` shortcut, then:
@@ -72,6 +85,8 @@ KeyPin includes a built-in CLI inside the app bundle. Before configuring a conve
 ```
 
 ### Initial CLI Setup
+
+Homebrew already provides the `keypin` command, so you can use the commands below directly and enable launch at login in the app's Settings if desired. For a manually installed app, follow these steps to set up the CLI entry point.
 
 To invoke `keypin` directly from your shell as a user command, find your desired input source ID via `list` above, then run `install` from the application bundle (example using a common input source ID):
 

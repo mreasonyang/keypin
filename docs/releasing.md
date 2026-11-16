@@ -105,6 +105,14 @@ Universal 新版已完成 [0.0.17 → 0.0.18 的正式远程升级及双架构�
 发布升级验收应使用真实公开的旧、新版本。修改本地版本元数据生成的测试基线仅可作为补充安装检查，不能代替正式远程升级验收。后续产品数据迁移及其他系统环境仍需对应验证；核心输入法、中文候选和跨 App 焦点验收按产品自身要求执行。
 
 
+## Homebrew 分发
+
+[mreasonyang/homebrew-taps](https://github.com/mreasonyang/homebrew-taps) 中的 `Casks/keypin.rb` 提供 `brew install --cask mreasonyang/taps/keypin`，复用正式发布的 Universal DMG，并固定版本和 SHA-256；同时链接应用内 CLI 为 `keypin`，不主动修改输入法或注册登录启动。
+
+Tap 的 **Update KeyPin cask** 工作流每 6 小时读取最新公开稳定版，也可在该仓库手动运行。同步前核对 `verification.json` 的版本、双架构、签名和公证结果，以及 GitHub 资产摘要与 `SHA256SUMS`；草稿、预发布、不完整产物及版本降级均拒绝。无需在 KeyPin 仓库配置跨仓库 token。第 5 步公开正式版后，可手动触发同步，或等待定时检查；无需重新构建或重新签名。
+
+Tap 的 **Verify KeyPin Homebrew installation** 工作流验证 Apple silicon 和 Intel 上的安装、CLI、签名、公证票据、重装与保留配置的卸载。自动同步在提交 Cask 更新后通过 `workflow_dispatch` 触发安装验证，也可手动运行。
+
 ## 为已发布版本补充 DMG
 
 在 `main` 手动运行 **Add notarized DMG to an existing release**，输入已有稳定标签（例如 `v0.0.19`）。流程下载 GitHub 已发布的 Universal ZIP，核对 GitHub 资产摘要与大小，验证应用签名、公证票据及架构，不重新构建应用。DMG 内含原样的 `KeyPin.app` 和 `/Applications` 快捷方式；挂载比对应用内容后，再用临时钥匙串签名、公证、附加票据并验证 DMG 的 Gatekeeper 结果。

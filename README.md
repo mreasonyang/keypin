@@ -35,6 +35,19 @@ KeyPin 是一款轻量的 macOS 菜单栏工具。在不同应用（如终端、
 
 ## 安装与运行
 
+### 使用 Homebrew
+
+```sh
+brew install --cask mreasonyang/taps/keypin
+open -a KeyPin
+```
+
+通过维护者的 [Homebrew tap](https://github.com/mreasonyang/homebrew-taps) 安装已签名、公证的 Universal 应用，同时提供 `keypin` 命令。首次打开后，在应用中选择输入法及登录启动偏好。
+
+更新可使用应用内更新，或运行 `brew update && brew upgrade --cask mreasonyang/taps/keypin`。如果已手动安装当前相同的正式版，可用 `brew install --cask --adopt mreasonyang/taps/keypin` 纳入 Homebrew 管理。
+
+卸载前请在设置中关闭「登录时启动」（或执行 `keypin uninstall`），再运行 `brew uninstall --cask mreasonyang/taps/keypin`；配置和诊断日志会保留。若需同时清除这些数据及登录项，使用 `brew uninstall --cask --zap mreasonyang/taps/keypin`。
+
 ### 使用预编译应用包
 
 从[官网](https://keypin.kyun.si)直接下载 GitHub Releases 上的 Universal DMG，同一个安装包适用于 Apple silicon 和 Intel Mac。打开 DMG 后，将 `KeyPin.app` 拖入 `Applications` 快捷方式。然后：
@@ -72,6 +85,8 @@ KeyPin 应用包内置了完整 CLI。在尚未配置终端快捷命令前，可
 ```
 
 ### 首次配置终端入口
+
+Homebrew 安装已提供 `keypin` 命令，可以直接执行下方常用命令；需要登录启动时可在应用设置中开启。手动安装应用时，按以下步骤配置终端入口。
 
 若希望直接在终端使用 `keypin` 用户命令，先通过上文的 `list` 命令获取可用输入源 ID，然后从应用包内运行 `install`（以常见系统输入法 ID 为例）：
 
