@@ -23,8 +23,101 @@ final class AgentTests: XCTestCase {
         let data = try AgentController.agentPlist(binary: binary)
         let plist = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any])
         XCTAssertEqual(plist["Label"] as? String, "app.keypin")
+        XCTAssertEqual(plist["AssociatedBundleIdentifiers"] as? [String], ["app.keypin"])
         XCTAssertEqual(plist["ProgramArguments"] as? [String], [binary.path, "background"])
         XCTAssertEqual(plist["RunAtLoad"] as? Bool, true)
+    }
+
+    func testLegacyAttributionMigrationPreservesDisabledLoadedJobAndCustomSettings() throws {
+        let runner = Runner(disabled: true, loaded: true)
+        let agent = controller(runner)
+        var legacy = try XCTUnwrap(PropertyListSerialization.propertyList(
+            from: AgentController.agentPlist(binary: binary), format: nil) as? [String: Any])
+        legacy.removeValue(forKey: "AssociatedBundleIdentifiers")
+        legacy["EnvironmentVariables"] = ["KEYPIN_TEST": "preserve"]
+        try writePlist(agent, data: PropertyListSerialization.data(fromPropertyList: legacy, format: .binary, options: 0))
+
+        try agent.migrateLoginItemAttribution(executable: binary)
+
+        let migrated = try Data(contentsOf: agent.plist)
+        var format = PropertyListSerialization.PropertyListFormat.xml
+        let values = try XCTUnwrap(PropertyListSerialization.propertyList(from: migrated, format: &format) as? [String: Any])
+        XCTAssertEqual(format, .binary)
+        XCTAssertEqual(values["AssociatedBundleIdentifiers"] as? [String], ["app.keypin"])
+        var unchanged = values
+        unchanged.removeValue(forKey: "AssociatedBundleIdentifiers")
+        XCTAssertEqual(unchanged as NSDictionary, legacy as NSDictionary)
+        XCTAssertTrue(runner.disabled)
+        XCTAssertTrue(runner.loaded)
+        XCTAssertTrue(runner.calls.isEmpty)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: agent.symlink.path))
+
+        try agent.migrateLoginItemAttribution(executable: binary)
+        XCTAssertEqual(try Data(contentsOf: agent.plist), migrated)
+        XCTAssertTrue(runner.calls.isEmpty)
+    }
+
+    func testAttributionMigrationDoesNotCreateUninstalledLoginItem() throws {
+        let runner = Runner()
+        let agent = controller(runner)
+        try agent.migrateLoginItemAttribution(executable: binary)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: agent.plist.path))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: agent.symlink.path))
+        XCTAssertTrue(runner.calls.isEmpty)
+    }
+
+    func testAttributionMigrationPreservesExistingAssociationBytes() throws {
+        let agent = controller(Runner())
+        for association: Any in [["app.keypin"], "app.keypin", ["app.custom"]] {
+            var values = try XCTUnwrap(PropertyListSerialization.propertyList(
+                from: AgentController.agentPlist(binary: binary), format: nil) as? [String: Any])
+            values["AssociatedBundleIdentifiers"] = association
+            let original = try PropertyListSerialization.data(fromPropertyList: values, format: .xml, options: 0)
+            try writePlist(agent, data: original)
+            try agent.migrateLoginItemAttribution(executable: binary)
+            XCTAssertEqual(try Data(contentsOf: agent.plist), original)
+        }
+    }
+
+    func testAttributionMigrationPreservesOtherInstallationAndUnexpectedJob() throws {
+        let runner = Runner()
+        let agent = controller(runner)
+        var original = try XCTUnwrap(PropertyListSerialization.propertyList(
+            from: AgentController.agentPlist(binary: binary), format: nil) as? [String: Any])
+        original.removeValue(forKey: "AssociatedBundleIdentifiers")
+        for (key, value): (String, Any) in [
+            ("Label", "app.other"),
+            ("ProgramArguments", [home.appendingPathComponent("Other.app/Contents/MacOS/keypin").path, "background"]),
+            ("ProgramArguments", [binary.path, "gui"]),
+            ("ProgramArguments", [String]()),
+        ] {
+            var values = original
+            values[key] = value
+            let data = try PropertyListSerialization.data(fromPropertyList: values, format: .xml, options: 0)
+            try writePlist(agent, data: data)
+            try agent.migrateLoginItemAttribution(executable: binary)
+            XCTAssertEqual(try Data(contentsOf: agent.plist), data)
+        }
+        XCTAssertTrue(runner.calls.isEmpty)
+    }
+
+    func testAttributionMigrationPreservesSymlinkAndItsTarget() throws {
+        let agent = controller(Runner())
+        let target = home.appendingPathComponent("custom.plist")
+        let original = Data("user-managed configuration".utf8)
+        try original.write(to: target)
+        try makeLink(agent.plist, to: target.path)
+        try agent.migrateLoginItemAttribution(executable: binary)
+        XCTAssertEqual(try linkDestination(agent.plist), target.path)
+        XCTAssertEqual(try Data(contentsOf: target), original)
+    }
+
+    func testAttributionMigrationReportsMalformedPlistWithoutReplacingIt() throws {
+        let agent = controller(Runner())
+        let original = Data("invalid plist".utf8)
+        try writePlist(agent, data: original)
+        XCTAssertThrowsError(try agent.migrateLoginItemAttribution(executable: binary))
+        XCTAssertEqual(try Data(contentsOf: agent.plist), original)
     }
 
     func testFreshInstallEnablesBeforeBootstrapAndCreatesExplicitCLICommand() throws {

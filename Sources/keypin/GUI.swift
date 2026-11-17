@@ -50,6 +50,10 @@ final class AppController: NSObject, NSApplicationDelegate {
             NSApp.applicationIconImage = icon
         }
         guard adoptExistingInstance() == false else { return }
+        if !model.isPreview, let executable = Bundle.main.executableURL {
+            do { try Agent.migrateLoginItemAttribution(executable: executable) }
+            catch { NSLog("Unable to update KeyPin login item attribution: %@", String(describing: error)) }
+        }
         configurePopover()
         configureStatusItem()
         model.start()

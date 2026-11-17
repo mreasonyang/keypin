@@ -62,6 +62,8 @@ Download the Universal DMG directly from GitHub Releases using the [website](htt
 
 Open Settings > About and choose Check for Updates. Sparkle checks GitHub Releases, downloads a new version, and handles installation and relaunch. Automatic checks and automatic downloading/installation are off by default and can be enabled separately in About. Updates preserve your input-source configuration and launch-at-login setting.
 
+The login item is associated with the KeyPin app name. The first launch after upgrading adds this association to legacy login items while preserving their enabled state.
+
 Local development builds without an update public key show updates as unavailable. Version 0.0.14 and earlier cannot install updates in-app; manually install the first official version that includes automatic updates.
 
 ### Building from Source

@@ -11,6 +11,10 @@ enum Agent {
         try controller.install(executable: executable, installCLICommand: installCLICommand)
     }
 
+    static func migrateLoginItemAttribution(executable: URL) throws {
+        try controller.migrateLoginItemAttribution(executable: executable)
+    }
+
     /// Turning off login startup in the GUI must leave the current application open.
     /// The CLI's explicit uninstall also stops the registered background instance.
     static func uninstall(stopRunningAgent: Bool = true) throws {
@@ -148,10 +152,32 @@ struct AgentController {
         }
     }
 
+    /// Upgrade only this installation's legacy metadata. Never enable, reload, or
+    /// recreate a job: the user may have disabled or removed login startup.
+    func migrateLoginItemAttribution(executable: URL) throws {
+        guard fileManager.fileExists(atPath: plist.path) else { return }
+        let attributes = try plist.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey])
+        guard attributes.isRegularFile == true, attributes.isSymbolicLink != true else { return }
+        let original = try Data(contentsOf: plist)
+        var format = PropertyListSerialization.PropertyListFormat.xml
+        guard var values = try PropertyListSerialization.propertyList(from: original, format: &format) as? [String: Any],
+              values["Label"] as? String == Agent.label,
+              let arguments = values["ProgramArguments"] as? [String],
+              arguments.count == 2, arguments[1] == "background",
+              URL(fileURLWithPath: arguments[0]).resolvingSymlinksInPath() == executable.resolvingSymlinksInPath(),
+              values["AssociatedBundleIdentifiers"] == nil else { return }
+        values["AssociatedBundleIdentifiers"] = [Agent.label]
+        let updated = try PropertyListSerialization.data(fromPropertyList: values, format: format, options: 0)
+        try updated.write(to: plist, options: .atomic)
+    }
+
     static func agentPlist(binary: URL) throws -> Data {
         // PropertyListSerialization escapes &, <, > and other legal path characters.
         try PropertyListSerialization.data(fromPropertyList: [
             "Label": Agent.label,
+            // Without this association, Login Items displays the signing identity's
+            // developer name instead of KeyPin for a legacy LaunchAgent.
+            "AssociatedBundleIdentifiers": [Agent.label],
             "ProgramArguments": [binary.path, "background"],
             "RunAtLoad": true,
             "LimitLoadToSessionType": "Aqua",
