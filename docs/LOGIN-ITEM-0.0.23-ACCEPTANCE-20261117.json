@@ -1,0 +1,41 @@
+{
+  "version": "0.0.23",
+  "build": "24",
+  "commit": "ecc93bb39fe164d7884ffc668c68f85774b5a750",
+  "ci": "https://github.com/mreasonyang/keypin/actions/runs/44001216344",
+  "releaseWorkflow": "https://github.com/mreasonyang/keypin/actions/runs/44002289258",
+  "signedDraftInstallation": true,
+  "legacyAttributionMigratedOnFirstLaunch": true,
+  "systemSettingsName": "KeyPin",
+  "loginEnabledPreserved": true,
+  "inputConfigurationPreserved": true,
+  "cliPreserved": true,
+  "installedAppMatchesZIP": true,
+  "automaticUpdatePreferencesPreserved": true,
+  "nativeTests": 195,
+  "ciIntelTests": 195,
+  "macOS15Arm64Runtime": true,
+  "macOS15IntelRuntime": true,
+  "limits": [
+    "No logout/reboot performed",
+    "No new macOS 13/14 physical-device acceptance",
+    "Real CJK candidate/composition input not newly validated"
+  ],
+  "productionSparkleUpgrade": {
+    "from": "0.0.22 (23)",
+    "to": "0.0.23 (24)",
+    "passed": true,
+    "legacyLoginItemAutomaticallyMigrated": true,
+    "configurationPreserved": true,
+    "installedAppMatchesPublicZIP": true,
+    "cliPreserved": true,
+    "loginDisabledOverridePreserved": true,
+    "automaticUpdatePreferencesPreserved": true,
+    "systemSettingsName": "KeyPin",
+    "aboutVersionConfirmed": true
+  },
+  "anonymousAssetReadback": true,
+  "productionLatestFeedMatchesRelease": true,
+  "schemaVersion": 1,
+  "date": "2026-11-17"
+}
